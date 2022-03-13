@@ -45,7 +45,7 @@ function innitIframe() {
 
 function updateIframe(){
 	iframe.srcdoc = iframe_code.html + 
-					'<style>' + iframe_code.css + '</script>' + 
+					'<style>' + iframe_code.css + '</style>' + 
 					'<script>' + iframe_code.js + '</script>';
 }
 
