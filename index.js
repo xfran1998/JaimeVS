@@ -55,6 +55,10 @@ io.on('connection', (socket) => {
 
     socket.on('client_code', (data) =>{
         socket.broadcast.emit('server_code', data);
+        
+        if (iframe_code[data.id] != null) 
+            iframe_code[data.id] = data.code;
+
         console.log(data);
     });
 

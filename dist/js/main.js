@@ -184,6 +184,9 @@ socket.on('server_code', data => {
 });
 
 socket.on('get_code_server', data => {
-	iframe_code = data;
+	setCodeFromEditor('html', data.html);
+	setCodeFromEditor('css', data.css);
+	setCodeFromEditor('js', data.js);	
+	
 	updateIframe();
 });
