@@ -47,6 +47,28 @@ function initIframe() {
 	socket.emit("get_code_client");
 }
 
+// addEventListener keyup will trigger when client press a key on editor 1
+$("#html").addEventListener("keyup", function (e) {
+	getCodeFromEditor("html");
+	socket.emit('client_code', { id: "html", code: iframe_code.html});
+	updateIframe();
+});
+
+// addEventListener keyup will trigger when client press a key on editor 1
+$("#css").addEventListener("keyup", function (e) {
+	getCodeFromEditor("css");
+	socket.emit('client_code', { id: "css", code: iframe_code.css });
+	updateIframe();
+});
+
+// addEventListener keyup will trigger when client press a key on editor 1
+$("#js").addEventListener("keyup", function (e) {
+	getCodeFromEditor("js");
+	socket.emit('client_code', { id: "js", code: iframe_code.js });
+	updateIframe();
+});
+
+
 function updateIframe(){
 	console.log("updateIframe");
 	debounce(() => {
@@ -74,11 +96,6 @@ require(["vs/editor/editor.main"], function () {
 		// no line numbers
 		lineNumbers: false,
 		
-	});
-	editor.html.getModel().onDidChangeContent((event) => {
-		getCodeFromEditor("html");
-		socket.emit('client_code', { id: "html", code: iframe_code.html});
-		updateIframe();
 	});
 	// autocomplete html
 	monaco.languages.registerCompletionItemProvider('html', 
@@ -138,11 +155,6 @@ require(["vs/editor/editor.main"], function () {
 		// no line numbers
 		lineNumbers: false,
 	});
-	editor.css.getModel().onDidChangeContent((event) => {
-		getCodeFromEditor("css");
-		socket.emit('client_code', { id: "css", code: iframe_code.css });
-		updateIframe();
-	});
 });
 
 // Instance 3
@@ -161,11 +173,6 @@ require(["vs/editor/editor.main"], function () {
 		// wordWrap: 'on',
 		// no line numbers
 		lineNumbers: false,
-	});
-	editor.js.getModel().onDidChangeContent((event) => {
-		getCodeFromEditor("js");
-		socket.emit('client_code', { id: "js", code: iframe_code.js });
-		updateIframe();
 	});
 });
 
