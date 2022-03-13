@@ -31,19 +31,18 @@ io.on('connection', (socket) => {
 
     socket.on("disconnecting", () => {
         // Deleting users
+        if (socket_users[socket.id] == null) return; // check if user exists
+        if (!socket_rooms[room_id].includes(socket.id)) return;  // check if user is in room
+        var room_id = socket_users[socket.id].room;
         
         // Deleting user form rooms if was in one
-        if (socket_users[socket.id] == null) return; // check if user exists
-        if (!socket_rooms[socket_users[socket.id].room].contains(socket.id)) return;  // check if user is in room
-
-        // remove user from room
-        socket_rooms[socket_users[socket.id].room].splice(socket_rooms[socket_users[socket.id].room].indexOf(socket.id), 1);
+        socket_rooms[room_id].splice(socket_rooms[room_id].indexOf(socket.id), 1);
         // remove user from users
         delete socket_users[socket.id];
-
+        
         // if room is empty, delete room
-        if (socket_rooms[socket_users[socket.id].room].length == 0) {
-            delete socket_rooms[socket_users[socket.id].room];
+        if (socket_rooms[room_id].length == 0) {
+            delete socket_rooms[room_id];
         }
 
         console.log("**** DISCONNECTING ****");
@@ -56,19 +55,21 @@ io.on('connection', (socket) => {
     // msg to change code on server and other clients in the same room
     socket.on('client_code', (data) =>{
         // ('server_code', data);
-        io.to(socket_users[socket.id].room).emit('server_code', data);
-
+        if (socket_users[socket.id] == null) return; // check if user exists
+        socket.broadcast.to(socket_users[socket.id].room).emit('server_code', data);
+        
         /*if (iframe_code[data.id] != null) 
-            iframe_code[data.id] = data.code; */
-
+        iframe_code[data.id] = data.code; */
+        
         if (data.id !== 'html' || data.id !== 'css' || data.id !== 'js') return; // check if id is valid
-
+        
         iframe_code_rooms[socket_users[socket.id].room][data.id] = data.code; // update iframe code of the room
         console.log(iframe_code_rooms[socket_users[socket.id].room]);
     });
-
+    
     // msg to set up client code at the beginning
     socket.on('get_code_client', () => {
+        if (socket_users[socket.id] == null) return; // check if user exists
         // ('get_code_server', iframe_code);
         // emit only in the room of the client
         socket.emit('get_code_server', iframe_code_rooms[socket_users[socket.id].room]);

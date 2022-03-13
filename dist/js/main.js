@@ -5,6 +5,7 @@ require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-edi
 
 var UPDATE_RATE = 0; // each 5000 will update if the code has not been changed in more than 5000 ms
 var iframe = $("#iframe-res");
+var lastPosition;
 
 var iframe_code =
 {
@@ -36,8 +37,9 @@ function getCodeFromEditor(id) {
 function setCodeFromEditor(id, code) {
 	if (editor[id] == null) return;
 	iframe_code[id] = code;
-	editor[id].setValue(code);
-	
+
+	if(code !== editor[id].getValue())
+		editor[id].setValue(code);
 }
 
 function initIframe() {
@@ -79,7 +81,6 @@ function updateIframe(){
 						console.log("updateIframeJS");
 						${iframe_code.js}
 					}, ${UPDATE_RATE});</script>`;
-	
 }
 
 // Instance 1
@@ -98,47 +99,60 @@ require(["vs/editor/editor.main"], function () {
 		// wordWrap: 'on',
 		// no line numbers
 		lineNumbers: false,
-		
 	});
-	// autocomplete html
-	monaco.languages.registerCompletionItemProvider('html', 
-	{
-		triggerCharacters: ['>'],
-		provideCompletionItems: (model, position) => 
+
+	window.onresize = function () {
+		editor.html.layout();
+	};
+
+	editor.html.onDidChangeModelContent((e)=>{ 
+		editor.html.setPosition({lineNumber:10, column:2}); 
+		editor.html.focus(); 
+		});
+
+		editor.html.onDidChangeCursorPosition(e => {
+				console.log('Cursor changed', editor.html.getPosition());
+		});
+
+		// autocomplete html
+		monaco.languages.registerCompletionItemProvider('html', 
 		{
-			const codePre = model.getValueInRange({
-				startLineNumber: position.lineNumber,
-				startColumn: 1,
-				endLineNumber: position.lineNumber,
-				endColumn: position.column,
-			});
+			triggerCharacters: ['>'],
+			provideCompletionItems: (model, position) => 
+			{
+				const codePre = model.getValueInRange({
+					startLineNumber: position.lineNumber,
+					startColumn: 1,
+					endLineNumber: position.lineNumber,
+					endColumn: position.column,
+				});
+				
+				const tag = codePre.match(/.*<(\w+)>$/)?.[1];
+				
+				if (!tag) {
+					return;
+			}
 			
-			const tag = codePre.match(/.*<(\w+)>$/)?.[1];
+			const word = model.getWordUntilPosition(position);
 			
-			if (!tag) {
-				return;
-		}
-		
-		const word = model.getWordUntilPosition(position);
-		
-		return {
-			suggestions: [
-				{
-					label: `</${tag}>`,
-					kind: monaco.languages.CompletionItemKind.EnumMember,
-					insertText: `$1</${tag}>`,
-					insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-					range:  {
-						startLineNumber: position.lineNumber,
-						endLineNumber: position.lineNumber,
-						startColumn: word.startColumn,
-						endColumn: word.endColumn,
+			return {
+				suggestions: [
+					{
+						label: `</${tag}>`,
+						kind: monaco.languages.CompletionItemKind.EnumMember,
+						insertText: `$1</${tag}>`,
+						insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						range:  {
+							startLineNumber: position.lineNumber,
+							endLineNumber: position.lineNumber,
+							startColumn: word.startColumn,
+							endColumn: word.endColumn,
+						},
 					},
-				},
-			],
-		};
-	},
-});
+				],
+			};
+		},
+	});
 });
 
 // Instance 2
@@ -157,6 +171,14 @@ require(["vs/editor/editor.main"], function () {
 		// wordWrap: 'on',
 		// no line numbers
 		lineNumbers: false,
+	});
+	window.onresize = function () {
+		editor.css.layout();
+	};
+	editor.css.setPosition({lineNumber:10, column:2}); 
+	editor.css.focus(); 
+	editor.css.onDidChangeCursorPosition(e => {
+			console.log('Cursor changed', editor.css.getPosition());
 	});
 });
 
@@ -177,10 +199,20 @@ require(["vs/editor/editor.main"], function () {
 		// no line numbers
 		lineNumbers: false,
 	});
+
+	window.onresize = function () {
+		editor.js.layout();
+	};
+
+	editor.js.setPosition({lineNumber:10, column:2}); 
+	editor.js.focus(); 
+	editor.js.onDidChangeCursorPosition(e => {
+			console.log('Cursor changed', editor.js.getPosition());
+	});
 });
 
 socket.on('server_code', data => {
-	console.log('msg: ' + data.code);
+	console.log('msg-res: ' + data.code);
 	if (editor[data.id] == null) return;
 	
 	setCodeFromEditor(data.id, data.code); // change editor
