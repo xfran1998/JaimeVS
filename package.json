@@ -1,0 +1,19 @@
+{
+  "name": "vscode_online",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esm": "^3.2.25",
+    "express": "^4.17.3",
+    "monaco-editor": "0.32.1",
+    "socket.io": "^4.4.1"
+  }
+}

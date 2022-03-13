@@ -1,0 +1,34 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    width: 100vw;
+    height: 100vh;
+}
+
+iframe {
+    bottom: 0;
+    position: relative;
+    width: 100%;
+    min-height: 62vh;
+    border: 1px solid #dad5d5;
+}
+
+.code-container {
+    width: 33%;
+    min-height: 250px;
+    overflow: hidden;
+    margin: auto;
+    display: inline-block;
+    background: #f4f4f9;
+    outline: none;
+    height: 35vh;
+}
+
+.code-container > div {
+    height: 100%;
+    width: 100%;
+}
