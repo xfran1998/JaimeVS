@@ -9,6 +9,12 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const io = socketio(server);
 
+let iframe_code = {
+    html: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
+    css: ["h1 {", '\tcolor: red;', "}"].join("\n"),
+    js:  ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n")
+};
+
 // Seteando carpeta estatica, carpeta donde contiene todos los datos que requiere el usuario cuando hace la peticion
 // a la web buscando recursos.
 app.use(express.static(path.join(__dirname, 'dist')))
@@ -50,6 +56,10 @@ io.on('connection', (socket) => {
     socket.on('client_code', (data) =>{
         socket.broadcast.emit('server_code', data);
         console.log(data);
+    });
+
+    socket.on('get_code_client', () => {
+        socket.emit('get_code_server', iframe_code);
     });
 })
 

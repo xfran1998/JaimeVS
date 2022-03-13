@@ -40,15 +40,11 @@ function setCodeFromEditor(id, code) {
 }
 
 function innitIframe() {
-	if (editor.html == null) return;
-	if (editor.css == null) return;
-	if (editor.js == null) return;
+	// getCodeFromEditor("html");
+	// getCodeFromEditor("css");
+	// getCodeFromEditor("js");
 
-	getCodeFromEditor("html");
-	getCodeFromEditor("css");
-	getCodeFromEditor("js");
-	
-	updateIframe();
+	socket.emit("get_code_client");
 }
 
 function updateIframe(){
@@ -84,7 +80,7 @@ $("#js").addEventListener("keyup", function (e) {
 // Instance 1
 require(["vs/editor/editor.main"], function () {
 	editor.html = monaco.editor.create(document.getElementById("html"), {
-		value: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
+		value: "",
 		language: "html",
 		automaticLayout: true,
 		overviewRulerLanes: 0,
@@ -142,7 +138,7 @@ require(["vs/editor/editor.main"], function () {
 // Instance 2
 require(["vs/editor/editor.main"], function () {
 	editor.css = monaco.editor.create(document.getElementById("css"), {
-		value: ["h1 {", '\tcolor: red;', "}"].join("\n"),
+		value: "",
 		language: "css",
 		automaticLayout: true,
 		overviewRulerLanes: 0,
@@ -161,7 +157,7 @@ require(["vs/editor/editor.main"], function () {
 // Instance 3
 require(["vs/editor/editor.main"], function () {
 	editor.js = monaco.editor.create(document.getElementById("js"), {
-		value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
+		value: "",
 		language: "javascript",
 		automaticLayout: true,
 		overviewRulerLanes: 0,
@@ -184,5 +180,10 @@ socket.on('server_code', data => {
 	if (editor[data.id] == null) return;
 
 	setCodeFromEditor(data.id, data.code); // change editor
+	updateIframe();
+});
+
+socket.on('get_code_server', data => {
+	iframe_code = data;
 	updateIframe();
 });
