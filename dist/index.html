@@ -6,31 +6,53 @@
 		<link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-		<div class="code-container" id="html" placeholder="HTML"></div>
-		<div class="code-container" id="css" placeholder="CSS"></div>
-		<div class="code-container" id="js" placeholder="JavaScript"></div>
+        <div id="init-container">
+            <div id="init-logo">
+                <img src="img/logo_final.png" alt="browser-amd-editor" />
+            </div>
+            <div id="init-btns">
+                <button id="create-room">Create Room</button>
+                <button id="join-room">Join Room</button>
 
-		<!-- <div id="exTab3" class="container">
-            <ul class="nav nav-pills">
-                <li class="active"><a href="#1b" data-toggle="tab">Editor 1</a></li>
-                <li><a href="#2b" data-toggle="tab">Editor 2</a></li>
-            </ul>
-
-            <div class="tab-content clearfix">
-                <div class="tab-pane active" id="1b">
-                    <div id="html" style="width: 800px; height: 600px; border: 1px solid grey;"></div>
+                <div class="hidden enter-room" id="create-room-container">
+                    <label for="create-room-name">Room Name</label>
+                    <input type="text" id="create-room-name" placeholder="Room Name" />
+                    <button id="create-room-btn">Create</button>
                 </div>
-                <div class="tab-pane" id="2b">
-                    <div id="css" style="width: 800px; height: 600px; border: 1px solid grey;"></div>
+                <div class="hidden enter-room" id="join-room-container">
+                    <label for="join-room-name">Room Name</label>
+                    <input type="text" id="join-room-name" placeholder="Room Name" />
+                    <button id="join-room-btn">Join</button>
                 </div>
             </div>
-        </div> -->
-
-		<iframe id="iframe-res"></iframe>
-        
+        </div>
+        <div class="hidden" id="editor-container">
+            <div class="code-container" id="html" placeholder="HTML"></div>
+            <div class="code-container" id="css" placeholder="CSS"></div>
+            <div class="code-container" id="js" placeholder="JavaScript"></div>
+    
+            <!-- <div id="exTab3" class="container">
+                <ul class="nav nav-pills">
+                    <li class="active"><a href="#1b" data-toggle="tab">Editor 1</a></li>
+                    <li><a href="#2b" data-toggle="tab">Editor 2</a></li>
+                </ul>
+    
+                <div class="tab-content clearfix">
+                    <div class="tab-pane active" id="1b">
+                        <div id="html" style="width: 800px; height: 600px; border: 1px solid grey;"></div>
+                    </div>
+                    <div class="tab-pane" id="2b">
+                        <div id="css" style="width: 800px; height: 600px; border: 1px solid grey;"></div>
+                    </div>
+                </div>
+            </div> -->
+    
+            <iframe id="iframe-res"></iframe>
+        </div>
         <!-- impot socket.io -->
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.0/min/vs/loader.js"></script>
+        <script src="js/init.js"></script>
 		<script src="js/main.js"></script>
     </body>
 </html>

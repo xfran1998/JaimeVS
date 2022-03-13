@@ -7,6 +7,67 @@
 body{
     width: 100vw;
     height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#init-container, .enter-room{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#init-logo{
+    max-width: 200px;
+    max-height: 300px;
+}
+
+#init-logo img{
+    width: 100%;
+    height: 100%;
+}
+
+#init-btns{
+    margin-top: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#init-btns button, .enter-room input{
+    width: 200px;
+    padding: 10px;
+    margin: 20px;
+    border: 1px solid #0471a3;
+    border-radius: 3px;
+    background-color: #66cfff;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+.enter-room input{
+    border: 1px solid #90d9fb;
+    transition: all 0.1s ease;
+    background-color: #d3f0fd;
+}
+
+.enter-room input:focus{
+    border: 2px solid #2bb4f3;
+    outline: none;
+}
+
+.enter-room label{
+    font-size: 1.4rem;
+}
+
+#init-btns button:hover{
+    background-color: #66cfff;
+    transform: scale(120%);
 }
 
 iframe {
@@ -32,3 +93,8 @@ iframe {
     height: 100%;
     width: 100%;
 }
+
+.hidden{
+    display: none !important;
+}
+

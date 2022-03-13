@@ -2,11 +2,8 @@
 // TODO: Add a way to save code
 
 require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.0/min/vs" }});
-const socket = io();
 
 var UPDATE_RATE = 0; // each 5000 will update if the code has not been changed in more than 5000 ms
-const $ = selector => document.querySelector(selector);
-const $$ = selector => document.querySelectorAll(selector);
 var iframe = $("#iframe-res");
 
 var iframe_code =
@@ -70,7 +67,6 @@ $("#js").addEventListener("keyup", function (e) {
 
 
 function updateIframe(){
-	// font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	iframe.srcdoc = iframe_code.html + 
 					'<style>' + iframe_code.css + '</style>' + 
 					`<script> 
@@ -182,8 +178,6 @@ require(["vs/editor/editor.main"], function () {
 		lineNumbers: false,
 	});
 });
-
-setTimeout(initIframe, 1000);
 
 socket.on('server_code', data => {
 	console.log('msg: ' + data.code);
