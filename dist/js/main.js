@@ -1,7 +1,10 @@
+// TODO: Add time out to prevent spamming, maybe use a debounce function, add debounce in iframe update only
+// TODO: Add a way to save code
+
 require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.0/min/vs" }});
 const socket = io();
 
-
+var UPDATE_RATE = 0; // each 5000 will update if the code has not been changed in more than 5000 ms
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
 var iframe = $("#iframe-res");
@@ -35,40 +38,24 @@ function getCodeFromEditor(id) {
 
 function setCodeFromEditor(id, code) {
 	if (editor[id] == null) return;
-	editor[id].setValue(code);
 	iframe_code[id] = code;
+	editor[id].setValue(code);
+	
 }
 
-function innitIframe() {
+function initIframe() {
 	socket.emit("get_code_client");
 }
 
 function updateIframe(){
-	iframe.srcdoc = iframe_code.html + 
-					'<style>' + iframe_code.css + '</style>' + 
-					'<script>' + iframe_code.js + '</script>';
+	console.log("updateIframe");
+	debounce(() => {
+		console.log("updateIfram123123");
+		iframe.srcdoc = iframe_code.html + 
+						'<style>' + iframe_code.css + '</style>' + 
+						'<script>' + iframe_code.js + '</script>';
+	}, UPDATE_RATE);
 }
-
-// addEventListener keyup will trigger when client press a key on editor 1
-$("#html").addEventListener("keyup", function (e) {
-	getCodeFromEditor("html");
-	socket.emit('client_code', { id: "html", code: iframe_code.html});
-	updateIframe();
-});
-
-// addEventListener keyup will trigger when client press a key on editor 1
-$("#css").addEventListener("keyup", function (e) {
-	getCodeFromEditor("css");
-	socket.emit('client_code', { id: "css", code: iframe_code.css });
-	updateIframe();
-});
-
-// addEventListener keyup will trigger when client press a key on editor 1
-$("#js").addEventListener("keyup", function (e) {
-	getCodeFromEditor("js");
-	socket.emit('client_code', { id: "js", code: iframe_code.js });
-	updateIframe();
-});
 
 // Instance 1
 require(["vs/editor/editor.main"], function () {
@@ -86,6 +73,12 @@ require(["vs/editor/editor.main"], function () {
 		// wordWrap: 'on',
 		// no line numbers
 		lineNumbers: false,
+		
+	});
+	editor.html.getModel().onDidChangeContent((event) => {
+		getCodeFromEditor("html");
+		socket.emit('client_code', { id: "html", code: iframe_code.html});
+		updateIframe();
 	});
 	// autocomplete html
 	monaco.languages.registerCompletionItemProvider('html', 
@@ -93,39 +86,39 @@ require(["vs/editor/editor.main"], function () {
 		triggerCharacters: ['>'],
 		provideCompletionItems: (model, position) => 
 		{
-		const codePre = model.getValueInRange({
-			startLineNumber: position.lineNumber,
-			startColumn: 1,
-			endLineNumber: position.lineNumber,
-			endColumn: position.column,
-		});
-	
-		const tag = codePre.match(/.*<(\w+)>$/)?.[1];
-	
-		if (!tag) {
-			return;
+			const codePre = model.getValueInRange({
+				startLineNumber: position.lineNumber,
+				startColumn: 1,
+				endLineNumber: position.lineNumber,
+				endColumn: position.column,
+			});
+			
+			const tag = codePre.match(/.*<(\w+)>$/)?.[1];
+			
+			if (!tag) {
+				return;
 		}
 		
 		const word = model.getWordUntilPosition(position);
-	
+		
 		return {
 			suggestions: [
-			{
-				label: `</${tag}>`,
-				kind: monaco.languages.CompletionItemKind.EnumMember,
-				insertText: `$1</${tag}>`,
-				insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-				range:  {
-				startLineNumber: position.lineNumber,
-				endLineNumber: position.lineNumber,
-				startColumn: word.startColumn,
-				endColumn: word.endColumn,
+				{
+					label: `</${tag}>`,
+					kind: monaco.languages.CompletionItemKind.EnumMember,
+					insertText: `$1</${tag}>`,
+					insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+					range:  {
+						startLineNumber: position.lineNumber,
+						endLineNumber: position.lineNumber,
+						startColumn: word.startColumn,
+						endColumn: word.endColumn,
+					},
 				},
-			},
 			],
 		};
-		},
-	});
+	},
+});
 });
 
 // Instance 2
@@ -144,6 +137,11 @@ require(["vs/editor/editor.main"], function () {
 		// wordWrap: 'on',
 		// no line numbers
 		lineNumbers: false,
+	});
+	editor.css.getModel().onDidChangeContent((event) => {
+		getCodeFromEditor("css");
+		socket.emit('client_code', { id: "css", code: iframe_code.css });
+		updateIframe();
 	});
 });
 
@@ -164,14 +162,19 @@ require(["vs/editor/editor.main"], function () {
 		// no line numbers
 		lineNumbers: false,
 	});
+	editor.js.getModel().onDidChangeContent((event) => {
+		getCodeFromEditor("js");
+		socket.emit('client_code', { id: "js", code: iframe_code.js });
+		updateIframe();
+	});
 });
 
-setTimeout(innitIframe, 1000);
+setTimeout(initIframe, 1000);
 
 socket.on('server_code', data => {
 	console.log('msg: ' + data.code);
 	if (editor[data.id] == null) return;
-
+	
 	setCodeFromEditor(data.id, data.code); // change editor
 	updateIframe();
 });
@@ -182,4 +185,13 @@ socket.on('get_code_server', data => {
 	setCodeFromEditor('js', data.js);	
 	
 	updateIframe();
+	UPDATE_RATE = 2000;
 });
+
+
+// AUX
+let debounceTimer;
+function debounce (callback, time) {
+  window.clearTimeout(debounceTimer);
+  debounceTimer = window.setTimeout(callback, time);
+};
