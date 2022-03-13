@@ -6,7 +6,7 @@ const socketio = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const PORT = 3000 || process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const io = socketio(server);
 
 // Seteando carpeta estatica, carpeta donde contiene todos los datos que requiere el usuario cuando hace la peticion
@@ -52,6 +52,5 @@ io.on('connection', (socket) => {
         console.log(data);
     });
 })
-
 
 server.listen(PORT, () => {console.log(`runing on port ${PORT}`);});
