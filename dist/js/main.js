@@ -70,13 +70,20 @@ $("#js").addEventListener("keyup", function (e) {
 
 
 function updateIframe(){
-	console.log("updateIframe");
-	debounce(() => {
-		console.log("updateIfram123123");
-		iframe.srcdoc = iframe_code.html + 
-						'<style>' + iframe_code.css + '</style>' + 
-						'<script>' + iframe_code.js + '</script>';
-	}, UPDATE_RATE);
+	// font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	iframe.srcdoc = iframe_code.html + 
+					'<style>' + iframe_code.css + '</style>' + 
+					`<script> 
+					let debounceTimer;
+					function debounce (callback, time) {
+					  window.clearTimeout(debounceTimer);
+					  debounceTimer = window.setTimeout(callback, time);
+					};
+					debounce(() => {
+						console.log("updateIframeJS");
+						${iframe_code.js}
+					}, ${UPDATE_RATE});</script>`;
+	
 }
 
 // Instance 1
@@ -192,7 +199,7 @@ socket.on('get_code_server', data => {
 	setCodeFromEditor('js', data.js);	
 	
 	updateIframe();
-	UPDATE_RATE = 2000;
+	UPDATE_RATE = 3000;
 });
 
 
