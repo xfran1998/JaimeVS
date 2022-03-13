@@ -40,10 +40,6 @@ function setCodeFromEditor(id, code) {
 }
 
 function innitIframe() {
-	// getCodeFromEditor("html");
-	// getCodeFromEditor("css");
-	// getCodeFromEditor("js");
-
 	socket.emit("get_code_client");
 }
 
@@ -55,26 +51,23 @@ function updateIframe(){
 
 // addEventListener keyup will trigger when client press a key on editor 1
 $("#html").addEventListener("keyup", function (e) {
-	var code = getCodeFromEditor("html");
+	getCodeFromEditor("html");
 	socket.emit('client_code', { id: "html", code: iframe_code.html});
 	updateIframe();
-	console.log(code);
 });
 
 // addEventListener keyup will trigger when client press a key on editor 1
 $("#css").addEventListener("keyup", function (e) {
-	var code = getCodeFromEditor("css");
+	getCodeFromEditor("css");
 	socket.emit('client_code', { id: "css", code: iframe_code.css });
 	updateIframe();
-	console.log(code);
 });
 
 // addEventListener keyup will trigger when client press a key on editor 1
 $("#js").addEventListener("keyup", function (e) {
-	var code = getCodeFromEditor("js");
+	getCodeFromEditor("js");
 	socket.emit('client_code', { id: "js", code: iframe_code.js });
 	updateIframe();
-	console.log(code);
 });
 
 // Instance 1
