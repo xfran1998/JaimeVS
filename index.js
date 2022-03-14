@@ -30,10 +30,19 @@ io.on('connection', (socket) => {
     console.log("Nueva conexion!!");
 
     socket.on("disconnecting", () => {
+        console.log("**** DISCONNECTING 1 ****");
+        console.log(socket.id);
+        console.log(socket_users);
+        console.log(socket_rooms);
+        console.log("**********************");
         // Deleting users
         if (socket_users[socket.id] == null) return; // check if user exists
-        if (!socket_rooms[room_id].includes(socket.id)) return;  // check if user is in room
+        console.log('user exists');
         var room_id = socket_users[socket.id].room;
+        if (socket_rooms[room_id] == null) return; // check if room exists
+        console.log('room exists');
+        if (!socket_rooms[room_id].includes(socket.id)) return;  // check if user is in room
+        console.log('user inside room');
         
         // Deleting user form rooms if was in one
         socket_rooms[room_id].splice(socket_rooms[room_id].indexOf(socket.id), 1);
@@ -44,8 +53,7 @@ io.on('connection', (socket) => {
         if (socket_rooms[room_id].length == 0) {
             delete socket_rooms[room_id];
         }
-
-        console.log("**** DISCONNECTING ****");
+        console.log("**** DISCONNECTING 2 ****");
         console.log(socket.id);
         console.log(socket_users);
         console.log(socket_rooms);

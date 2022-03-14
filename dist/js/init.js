@@ -2,6 +2,9 @@ const socket = io();
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
 
+var option_program = null;
+
+// create room container
 $('#create-room').addEventListener('click', function (e) {
     // socket.emit('create_room');
     console.log('create room');
@@ -13,6 +16,7 @@ $('#create-room').addEventListener('click', function (e) {
 });
 
 
+// join room container
 $('#join-room').addEventListener('click', function (e) {
     // socket.emit('join_room');
     console.log('join room');
@@ -23,6 +27,8 @@ $('#join-room').addEventListener('click', function (e) {
     $('#join-room-container').classList.remove('hidden');
 });
 
+
+// create room button
 $('#create-room-btn').addEventListener('click', function (e) {
     var room = $('#create-room-name').value;
     room = room.replace(' ', '_');
@@ -40,6 +46,8 @@ $('#create-room-btn').addEventListener('click', function (e) {
     }
 });
 
+
+// join room button
 $('#join-room-btn').addEventListener('click', function (e) {
   var room = $('#join-room-name').value;
   room = room.replace(' ', '_');
@@ -55,6 +63,18 @@ $('#join-room-btn').addEventListener('click', function (e) {
   if (room.length > 0) {
     socket.emit('join_room', {room: room});
   }
+});
+
+
+// program option button
+$('#web-dev-btn').addEventListener('click', function (e) {
+  option_program = 'web-dev';
+
+  // hide all option buttons container
+  $('#program-option-container').classList.add('hidden');
+  
+  // show create name room container
+  $('.create-name-room-container').classList.remove('hidden');
 });
 
 socket.on('enter_room', (response) => {

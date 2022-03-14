@@ -7,10 +7,10 @@
 body{
     width: 100vw;
     height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Robot', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#init-container, .enter-room{
+#init-container, .enter-room, #program-option-container, .create-name-room-container{
     width: 100%;
     height: 100%;
     display: flex;
@@ -37,17 +37,23 @@ body{
     flex-direction: column;
 }
 
-#init-btns button, .enter-room input{
+#init-btns button, .enter-room input, #program-option-container button{
     width: 200px;
     padding: 10px;
     margin: 20px;
     border: 1px solid #0471a3;
-    border-radius: 3px;
+    border-radius: 5px;
     background-color: #66cfff;
     font-size: 1rem;
     font-weight: 400;
     cursor: pointer;
     transition: all 0.5s ease;
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.create-name-room-container label{
+    margin: 0;
 }
 
 .enter-room input{
@@ -65,9 +71,29 @@ body{
     font-size: 1.4rem;
 }
 
-#init-btns button:hover{
+#init-btns button:hover,  #program-option-container button:hover{
     background-color: #66cfff;
     transform: scale(120%);
+}
+
+#program-option-container button{
+    display:flex;
+    align-items: center;
+    width: 200px;
+    height: 45px;
+    padding: 5px 10px;
+}
+
+#program-option-container button p{
+    display: inline-block;
+    padding-left: 20px;
+}
+
+
+
+#program-option-container img{
+    height: 100%;
+    border-radius: 5px;
 }
 
 iframe {
@@ -97,4 +123,5 @@ iframe {
 .hidden{
     display: none !important;
 }
+
 

@@ -13,11 +13,21 @@
             <div id="init-btns">
                 <button id="create-room">Create Room</button>
                 <button id="join-room">Join Room</button>
-
                 <div class="hidden enter-room" id="create-room-container">
-                    <label for="create-room-name">Room Name</label>
-                    <input type="text" id="create-room-name" placeholder="Room Name" />
-                    <button id="create-room-btn">Create</button>
+                    <div id="program-option-container">
+                        <button id="web-dev-btn"><img src="img/world-wide-web.png" alt="web"><p>Web Dev</p></button>
+                        <button id="processing-btn"><img src="img/Processing_Icon.png" alt="processing"><p>Processing</p></button>
+                    </div>
+                    <div class="create-name-room-container hidden" id="web-dev">
+                        <label for="create-room-name">Room Name</label>
+                        <input type="text" id="create-room-name" placeholder="Room Name" />
+                        <button id="create-room-btn">Create</button>
+                    </div>
+                    <div class="create-name-room-container hidden" id="processing">
+                        <label for="create-room-name">Room Name</label>
+                        <input type="text" id="create-room-name" placeholder="Room Name" />
+                        <button id="create-room-btn">Create</button>
+                    </div>
                 </div>
                 <div class="hidden enter-room" id="join-room-container">
                     <label for="join-room-name">Room Name</label>
