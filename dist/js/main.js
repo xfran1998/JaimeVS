@@ -5,7 +5,7 @@ require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-edi
 
 var UPDATE_RATE = 0; // each 5000 will update if the code has not been changed in more than 5000 ms
 var iframe = $("#iframe-res");
-var lastPosition;
+var lastPosition = {column: 0,	lineNumber: 0};
 
 var iframe_code =
 {
@@ -107,82 +107,94 @@ require(["vs/editor/editor.main"], function () {
 
 	editor.html.onDidChangeModelContent((e)=>{ 
 		editor.html.setPosition({lineNumber:10, column:2}); 
-		editor.html.focus(); 
-		});
+		console.log('MODEL');
+		// editor.html.focus(); 
+	});
+	
+	editor.html.onDidChangeCursorPosition(e => {
+		lastPosition = editor.html.getPosition();
+		console.log('CURSOR');
+		console.log({lastPosition});
+		// console.log('Cursor changed', editor.html.getPosition());
+	});
 
-		editor.html.onDidChangeCursorPosition(e => {
-				console.log('Cursor changed', editor.html.getPosition());
-		});
-
-		// autocomplete html
-		monaco.languages.registerCompletionItemProvider('html', 
-		{
-			triggerCharacters: ['>'],
-			provideCompletionItems: (model, position) => 
+			// autocomplete html
+			monaco.languages.registerCompletionItemProvider('html', 
 			{
-				const codePre = model.getValueInRange({
-					startLineNumber: position.lineNumber,
-					startColumn: 1,
-					endLineNumber: position.lineNumber,
-					endColumn: position.column,
+				triggerCharacters: ['>'],
+				provideCompletionItems: (model, position) => 
+				{
+					const codePre = model.getValueInRange({
+						startLineNumber: position.lineNumber,
+						startColumn: 1,
+						endLineNumber: position.lineNumber,
+						endColumn: position.column,
 				});
 				
 				const tag = codePre.match(/.*<(\w+)>$/)?.[1];
 				
 				if (!tag) {
 					return;
-			}
-			
-			const word = model.getWordUntilPosition(position);
-			
-			return {
-				suggestions: [
-					{
-						label: `</${tag}>`,
-						kind: monaco.languages.CompletionItemKind.EnumMember,
-						insertText: `$1</${tag}>`,
-						insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-						range:  {
-							startLineNumber: position.lineNumber,
-							endLineNumber: position.lineNumber,
-							startColumn: word.startColumn,
-							endColumn: word.endColumn,
+				}
+				
+				const word = model.getWordUntilPosition(position);
+				
+				return {
+					suggestions: [
+						{
+							label: `</${tag}>`,
+							kind: monaco.languages.CompletionItemKind.EnumMember,
+							insertText: `$1</${tag}>`,
+							insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+							range:  {
+								startLineNumber: position.lineNumber,
+								endLineNumber: position.lineNumber,
+								startColumn: word.startColumn,
+								endColumn: word.endColumn,
+							},
 						},
-					},
-				],
-			};
-		},
+					],
+				};
+			},
+		});
 	});
-});
-
-// Instance 2
-require(["vs/editor/editor.main"], function () {
-	editor.css = monaco.editor.create(document.getElementById("css"), {
-		value: "",
-		language: "css",
-		automaticLayout: true,
-		overviewRulerLanes: 0,
-		hideCursorInOverviewRuler: true,
-		scrollbar: {
-			vertical: 'hidden'
-		},
-		overviewRulerBorder: false,
-		minimap: {enabled: true},
-		// wordWrap: 'on',
-		// no line numbers
-		lineNumbers: false,
+	
+	// Instance 2
+	require(["vs/editor/editor.main"], function () {
+		editor.css = monaco.editor.create(document.getElementById("css"), {
+			value: "",
+			language: "css",
+			automaticLayout: true,
+			overviewRulerLanes: 0,
+			hideCursorInOverviewRuler: true,
+			scrollbar: {
+				vertical: 'hidden'
+			},
+			overviewRulerBorder: false,
+			minimap: {enabled: true},
+			// wordWrap: 'on',
+			// no line numbers
+			lineNumbers: false,
+		});
+		window.onresize = function () {
+			editor.css.layout();
+		};
+		
+		editor.css.onDidChangeModelContent((e)=>{ 
+			editor.css.setPosition({lineNumber:10, column:2}); 
+			console.log('MODEL');
+			// editor.css.focus(); 
+		});
+		
+		editor.css.onDidChangeCursorPosition(e => {
+			lastPosition = editor.css.getPosition();
+			console.log('CURSOR');
+			console.log({lastPosition});
+			// console.log('Cursor changed', editor.css.getPosition());
+		});
 	});
-	window.onresize = function () {
-		editor.css.layout();
-	};
-	editor.css.setPosition({lineNumber:10, column:2}); 
-	editor.css.focus(); 
-	editor.css.onDidChangeCursorPosition(e => {
-			console.log('Cursor changed', editor.css.getPosition());
-	});
-});
-
-// Instance 3
+	
+	// Instance 3
 require(["vs/editor/editor.main"], function () {
 	editor.js = monaco.editor.create(document.getElementById("js"), {
 		value: "",
@@ -204,10 +216,17 @@ require(["vs/editor/editor.main"], function () {
 		editor.js.layout();
 	};
 
-	editor.js.setPosition({lineNumber:10, column:2}); 
-	editor.js.focus(); 
+	editor.js.onDidChangeModelContent((e)=>{ 
+		editor.js.setPosition({lineNumber:10, column:2}); 
+		console.log('MODEL');
+		console.log({lastPosition});
+		// editor.js.focus(); 
+	});
+	
 	editor.js.onDidChangeCursorPosition(e => {
-			console.log('Cursor changed', editor.js.getPosition());
+		console.log('CURSOR');
+		lastPosition = editor.js.getPosition();
+		// console.log('Cursor changed', editor.js.getPosition());
 	});
 });
 
