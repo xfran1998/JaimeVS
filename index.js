@@ -13,6 +13,7 @@ const io = socketio(server);
 
 const frame_rate = 30;
 const premium_frame_rate = 60;
+
 const init_iframe_code = {
     html: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
     css: ["h1 {", '\tcolor: red;', "}"].join("\n"),
@@ -66,24 +67,18 @@ io.on('connection', (socket) => {
 
     // msg to change code on server and other clients in the same room
     socket.on('client_code', (data) =>{
-        // ('server_code', data);
         if (socket_users[socket.id] == null) return; // check if user exists
         socket.broadcast.to(socket_users[socket.id].room).emit('server_code', data);
         
-        /*if (iframe_code[data.id] != null) 
-        iframe_code[data.id] = data.code; */
-        
-        if (data.id !== 'html' || data.id !== 'css' || data.id !== 'js') return; // check if id is valid
+        if (data.id !== 'html' && data.id !== 'css' && data.id !== 'js' && data.id !== 'processing') return; // check if id is valid
         
         iframe_code_rooms[socket_users[socket.id].room][data.id] = data.code; // update iframe code of the room
-        console.log(iframe_code_rooms[socket_users[socket.id].room]);
+        
     });
     
     // msg to set up client code at the beginning
     socket.on('get_code_client', (data) => {
         if (socket_users[socket.id] == null) return; // check if user exists
-        
-        console.log(iframe_code_rooms[socket_users[socket.id].room]);
 
         socket.emit('get_code_server', iframe_code_rooms[socket_users[socket.id].room]);
     });
@@ -128,14 +123,22 @@ io.on('connection', (socket) => {
         };
         
         // *** FOR WEB ***
+        console.log('Setting up iframe code');
+        iframe_code_rooms[data.room] = {};
         if (data.program == 'web') {
             // create initial code
-            iframe_code_rooms[data.room] = init_iframe_code;
+            Object.assign(iframe_code_rooms[data.room], init_iframe_code);
+            console.log('Setting up web code');
+            console.log(init_iframe_code);
         }
         // *** FOR PROCESSING ***
         else if (data.program == 'processing') {
             // create initial code
-            iframe_code_rooms[data.room] = init_processing_code;
+            // create a copy of init_processing_code
+            Object.assign(iframe_code_rooms[data.room], init_processing_code);
+            // iframe_code_rooms[data.room] = init_processing_code;
+            console.log('Setting up processing code');
+            console.log(init_processing_code);
         }
         
         // join the room
@@ -177,7 +180,8 @@ io.on('connection', (socket) => {
           // send response to client
           socket.emit('enter_room', {
             code: 200,
-            room: data.room
+            room: data.room,
+            program: socket_rooms[data.room].program
         });
     });
 });

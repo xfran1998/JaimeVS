@@ -24,11 +24,16 @@ function getCodeFromEditor(id) {
 	// }
 
 	iframe_code[id] = editor[id].getValue();
+
+	console.log(editor[id].getValue());
 }
 
 function setCodeFromEditor(id, code) {
-	if (editor[id] == null) return;
+	console.log('id: ' + id + ' code: ' + code);
+	if (id == null) return;
 	iframe_code[id] = code;
+
+	console.log('id: ' + id + ' code: ' + code);
 
 	if(code !== editor[id].getValue())
 		editor[id].setValue(code);
@@ -54,14 +59,14 @@ function setListenersForCodeEditor() {
 			socket.emit('client_code', { id: "html", code: iframe_code.html});
 			updateIframe();
 		});
-
+		
 		// addEventListener keyup will trigger when client press a key on editor 1
 		$("#css").addEventListener("keyup", function (e) {
 			getCodeFromEditor("css");
 			socket.emit('client_code', { id: "css", code: iframe_code.css });
 			updateIframe();
 		});
-
+		
 		// addEventListener keyup will trigger when client press a key on editor 1
 		$("#js").addEventListener("keyup", function (e) {
 			getCodeFromEditor("js");
@@ -70,33 +75,33 @@ function setListenersForCodeEditor() {
 		});
 		return;
 	}
-
+	
 	if (option_program == 'processing'){
+		console.log("setListenersForCodeEditor2:" + option_program);
 		// addEventListener keyup will trigger when client press a key on editor 1
-		$("#processing").addEventListener("keyup", function (e) {
+		$("#processing-editor").addEventListener("keyup", function (e) {
 			getCodeFromEditor("processing");
 			socket.emit('client_code', { id: "processing", code: iframe_code.processing });
-			updateIframe();
 		});
 		return;
 	}
-
+	
 	alert("Error, Code Editor type not found");
 }
 
 function updateIframe(){
 	iframe.srcdoc = iframe_code.html + 
-					'<style>' + iframe_code.css + '</style>' + 
-					`<script> 
-					let debounceTimer;
-					function debounce (callback, time) {
-					  window.clearTimeout(debounceTimer);
-					  debounceTimer = window.setTimeout(callback, time);
-					};
-					debounce(() => {
-						console.log("updateIframeJS");
-						${iframe_code.js}
-					}, ${UPDATE_RATE});</script>`;
+	'<style>' + iframe_code.css + '</style>' + 
+	`<script> 
+	let debounceTimer;
+	function debounce (callback, time) {
+		window.clearTimeout(debounceTimer);
+		debounceTimer = window.setTimeout(callback, time);
+	};
+	debounce(() => {
+		console.log("updateIframeJS");
+		${iframe_code.js}
+	}, ${UPDATE_RATE});</script>`;
 }
 
 function createCodeEditorContainers(){
@@ -118,11 +123,11 @@ function createCodeEditorContainers(){
 				// no line numbers
 				lineNumbers: false,
 			});
-
+			
 			window.onresize = function () {
 				editor.html.layout();
 			};
-
+			
 			editor.html.onDidChangeModelContent((e)=>{ 
 				editor.html.setPosition({lineNumber:10, column:2}); 
 				console.log('MODEL');
@@ -135,84 +140,84 @@ function createCodeEditorContainers(){
 				console.log({lastPosition});
 				// console.log('Cursor changed', editor.html.getPosition());
 			});
-
-					// autocomplete html
-					monaco.languages.registerCompletionItemProvider('html', 
-					{
-						triggerCharacters: ['>'],
-						provideCompletionItems: (model, position) => 
-						{
-							const codePre = model.getValueInRange({
-								startLineNumber: position.lineNumber,
-								startColumn: 1,
-								endLineNumber: position.lineNumber,
-								endColumn: position.column,
-						});
-						
-						const tag = codePre.match(/.*<(\w+)>$/)?.[1];
-						
-						if (!tag) {
-							return;
-						}
-						
-						const word = model.getWordUntilPosition(position);
-						
-						return {
-							suggestions: [
-								{
-									label: `</${tag}>`,
-									kind: monaco.languages.CompletionItemKind.EnumMember,
-									insertText: `$1</${tag}>`,
-									insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-									range:  {
-										startLineNumber: position.lineNumber,
-										endLineNumber: position.lineNumber,
-										startColumn: word.startColumn,
-										endColumn: word.endColumn,
-									},
+			
+			// autocomplete html
+			monaco.languages.registerCompletionItemProvider('html', 
+			{
+				triggerCharacters: ['>'],
+				provideCompletionItems: (model, position) => 
+				{
+					const codePre = model.getValueInRange({
+						startLineNumber: position.lineNumber,
+						startColumn: 1,
+						endLineNumber: position.lineNumber,
+						endColumn: position.column,
+					});
+					
+					const tag = codePre.match(/.*<(\w+)>$/)?.[1];
+					
+					if (!tag) {
+						return;
+					}
+					
+					const word = model.getWordUntilPosition(position);
+					
+					return {
+						suggestions: [
+							{
+								label: `</${tag}>`,
+								kind: monaco.languages.CompletionItemKind.EnumMember,
+								insertText: `$1</${tag}>`,
+								insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+								range:  {
+									startLineNumber: position.lineNumber,
+									endLineNumber: position.lineNumber,
+									startColumn: word.startColumn,
+									endColumn: word.endColumn,
 								},
-							],
-						};
-					},
-				});
+							},
+						],
+					};
+				},
+			});
+		});
+			
+		// Instance 2
+		require(["vs/editor/editor.main"], function () {
+			editor.css = monaco.editor.create(document.getElementById("css"), {
+				value: "",
+				language: "css",
+				automaticLayout: true,
+				overviewRulerLanes: 0,
+				hideCursorInOverviewRuler: true,
+				scrollbar: {
+					vertical: 'hidden'
+				},
+				overviewRulerBorder: false,
+				minimap: {enabled: true},
+				// wordWrap: 'on',
+				// no line numbers
+				lineNumbers: false,
+			});
+			window.onresize = function () {
+				editor.css.layout();
+			};
+			
+			editor.css.onDidChangeModelContent((e)=>{ 
+				editor.css.setPosition({lineNumber:10, column:2}); 
+				console.log('MODEL');
+				// editor.css.focus(); 
 			});
 			
-			// Instance 2
-			require(["vs/editor/editor.main"], function () {
-				editor.css = monaco.editor.create(document.getElementById("css"), {
-					value: "",
-					language: "css",
-					automaticLayout: true,
-					overviewRulerLanes: 0,
-					hideCursorInOverviewRuler: true,
-					scrollbar: {
-						vertical: 'hidden'
-					},
-					overviewRulerBorder: false,
-					minimap: {enabled: true},
-					// wordWrap: 'on',
-					// no line numbers
-					lineNumbers: false,
-				});
-				window.onresize = function () {
-					editor.css.layout();
-				};
-				
-				editor.css.onDidChangeModelContent((e)=>{ 
-					editor.css.setPosition({lineNumber:10, column:2}); 
-					console.log('MODEL');
-					// editor.css.focus(); 
-				});
-				
-				editor.css.onDidChangeCursorPosition(e => {
-					lastPosition = editor.css.getPosition();
-					console.log('CURSOR');
-					console.log({lastPosition});
-					// console.log('Cursor changed', editor.css.getPosition());
-				});
+			editor.css.onDidChangeCursorPosition(e => {
+				lastPosition = editor.css.getPosition();
+				console.log('CURSOR');
+				console.log({lastPosition});
+				// console.log('Cursor changed', editor.css.getPosition());
 			});
-			
-			// Instance 3
+		});
+		
+		// Instance 3
 		require(["vs/editor/editor.main"], function () {
 			editor.js = monaco.editor.create(document.getElementById("js"), {
 				value: "",
@@ -229,11 +234,11 @@ function createCodeEditorContainers(){
 				// no line numbers
 				lineNumbers: false,
 			});
-
+			
 			window.onresize = function () {
 				editor.js.layout();
 			};
-
+			
 			editor.js.onDidChangeModelContent((e)=>{ 
 				editor.js.setPosition({lineNumber:10, column:2}); 
 				console.log('MODEL');
@@ -247,13 +252,14 @@ function createCodeEditorContainers(){
 				// console.log('Cursor changed', editor.js.getPosition());
 			});
 		});
-
+		
 		return;
 	}
 	
 	if (option_program == 'processing'){
+		console.log("createCodeEditorContainers2:" + option_program);
 		require(["vs/editor/editor.main"], function () {
-			editor.processing = monaco.editor.create(document.getElementById("processing"), {
+			editor.processing = monaco.editor.create(document.getElementById("processing-editor"), {
 				value: "",
 				language: "java",
 				automaticLayout: true,
@@ -269,6 +275,7 @@ function createCodeEditorContainers(){
 				lineNumbers: false,
 			});
 
+			console.log('editor.processing', editor.processing);
 			window.onresize = function () {
 				editor.processing.layout();
 			};
@@ -307,10 +314,15 @@ socket.on('server_code', data => {
 socket.on('get_code_server', data => {
 	console.log('get_code_server: ');
 	console.log(data);
-	for (var i = 0; i < data.length; i++){
-		if (editor[data[i].id] == null) continue;
-		setCodeFromEditor(data[i].id, data[i].code); // change editor
+	console.log('**************')
+	
+	// iterate through editor objects
+	for (var key in data) {
+		console.log('key: ' + key);
+		setCodeFromEditor(key, data[key]); // change editor
 	}
+
+	console.log('**************')
 	
 	if (option_program == 'web')
 		updateIframe();
@@ -323,6 +335,7 @@ socket.on('enter_room', (response) => {
     return;
   }
 
+	option_program = response.program;
   console.log('enter room', response);
 
   if (response.program == 'web') {
