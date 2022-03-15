@@ -17,7 +17,7 @@ const premium_frame_rate = 60;
 const init_iframe_code = {
     html: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
     css: ["h1 {", '\tcolor: red;', "}"].join("\n"),
-    js:  ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n")
+    js:  ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n")
 };
 const init_processing_code = {
     processing: 'print("Hola Jaime");',

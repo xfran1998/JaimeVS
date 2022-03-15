@@ -25,15 +25,15 @@ function getCodeFromEditor(id) {
 
 	iframe_code[id] = editor[id].getValue();
 
-	console.log(editor[id].getValue());
+	// console.log(editor[id].getValue());
 }
 
 function setCodeFromEditor(id, code) {
-	console.log('id: ' + id + ' code: ' + code);
+	// console.log('id: ' + id + ' code: ' + code);
 	if (id == null) return;
 	iframe_code[id] = code;
 
-	console.log('id: ' + id + ' code: ' + code);
+	// console.log('id: ' + id + ' code: ' + code);
 
 	if(code !== editor[id].getValue())
 		editor[id].setValue(code);
@@ -77,7 +77,7 @@ function setListenersForCodeEditor() {
 	}
 	
 	if (option_program == 'processing'){
-		console.log("setListenersForCodeEditor2:" + option_program);
+		// console.log("setListenersForCodeEditor2:" + option_program);
 		// addEventListener keyup will trigger when client press a key on editor 1
 		$("#processing-editor").addEventListener("keyup", function (e) {
 			getCodeFromEditor("processing");
@@ -99,7 +99,7 @@ function updateIframe(){
 		debounceTimer = window.setTimeout(callback, time);
 	};
 	debounce(() => {
-		console.log("updateIframeJS");
+		console.log("*** updateIframeJS ***");
 		${iframe_code.js}
 	}, ${UPDATE_RATE});</script>`;
 }
@@ -130,14 +130,14 @@ function createCodeEditorContainers(){
 			
 			editor.html.onDidChangeModelContent((e)=>{ 
 				editor.html.setPosition({lineNumber:10, column:2}); 
-				console.log('MODEL');
+				// console.log('MODEL');
 				// editor.html.focus(); 
 			});
 			
 			editor.html.onDidChangeCursorPosition(e => {
 				lastPosition = editor.html.getPosition();
-				console.log('CURSOR');
-				console.log({lastPosition});
+				// console.log('CURSOR');
+				// console.log({lastPosition});
 				// console.log('Cursor changed', editor.html.getPosition());
 			});
 			
@@ -205,14 +205,14 @@ function createCodeEditorContainers(){
 			
 			editor.css.onDidChangeModelContent((e)=>{ 
 				editor.css.setPosition({lineNumber:10, column:2}); 
-				console.log('MODEL');
+				// console.log('MODEL');
 				// editor.css.focus(); 
 			});
 			
 			editor.css.onDidChangeCursorPosition(e => {
 				lastPosition = editor.css.getPosition();
-				console.log('CURSOR');
-				console.log({lastPosition});
+				// console.log('CURSOR');
+				// console.log({lastPosition});
 				// console.log('Cursor changed', editor.css.getPosition());
 			});
 		});
@@ -241,13 +241,13 @@ function createCodeEditorContainers(){
 			
 			editor.js.onDidChangeModelContent((e)=>{ 
 				editor.js.setPosition({lineNumber:10, column:2}); 
-				console.log('MODEL');
-				console.log({lastPosition});
+				// console.log('MODEL');
+				// console.log({lastPosition});
 				// editor.js.focus(); 
 			});
 			
 			editor.js.onDidChangeCursorPosition(e => {
-				console.log('CURSOR');
+				// console.log('CURSOR');
 				lastPosition = editor.js.getPosition();
 				// console.log('Cursor changed', editor.js.getPosition());
 			});
@@ -257,7 +257,7 @@ function createCodeEditorContainers(){
 	}
 	
 	if (option_program == 'processing'){
-		console.log("createCodeEditorContainers2:" + option_program);
+		// console.log("createCodeEditorContainers2:" + option_program);
 		require(["vs/editor/editor.main"], function () {
 			editor.processing = monaco.editor.create(document.getElementById("processing-editor"), {
 				value: "",
@@ -275,25 +275,25 @@ function createCodeEditorContainers(){
 				lineNumbers: false,
 			});
 
-			console.log('editor.processing', editor.processing);
+			// console.log('editor.processing', editor.processing);
 			window.onresize = function () {
 				editor.processing.layout();
 			};
 
 			editor.processing.onDidChangeModelContent((e)=>{ 
 				editor.processing.setPosition({lineNumber:10, column:2}); 
-				console.log('MODEL');
-				console.log({lastPosition});
+				// console.log('MODEL');
+				// console.log({lastPosition});
 				// editor.processing.focus(); 
 			});
 			
 			editor.processing.onDidChangeCursorPosition(e => {
-				console.log('CURSOR');
+				// console.log('CURSOR');
 				lastPosition = editor.processing.getPosition();
 				// console.log('Cursor changed', editor.processing.getPosition());
 			});
 		});
-		console.log(editor.processing);
+		// console.log(editor.processing);
 		return;
 	}
 
@@ -301,8 +301,8 @@ function createCodeEditorContainers(){
 }
 
 socket.on('server_code', data => {
-	console.log('server_code: ');
-	console.log(data);
+	// console.log('server_code: ');
+	// console.log(data);
 	if (editor[data.id] == null) return;
 	
 	setCodeFromEditor(data.id, data.code); // change editor
@@ -312,17 +312,17 @@ socket.on('server_code', data => {
 });
 
 socket.on('get_code_server', data => {
-	console.log('get_code_server: ');
-	console.log(data);
-	console.log('**************')
+	// console.log('get_code_server: ');
+	// console.log(data);
+	// console.log('**************')
 	
 	// iterate through editor objects
 	for (var key in data) {
-		console.log('key: ' + key);
+		// console.log('key: ' + key);
 		setCodeFromEditor(key, data[key]); // change editor
 	}
 
-	console.log('**************')
+	// console.log('**************')
 	
 	if (option_program == 'web')
 		updateIframe();
@@ -336,7 +336,7 @@ socket.on('enter_room', (response) => {
   }
 
 	option_program = response.program;
-  console.log('enter room', response);
+  // console.log('enter room', response);
 
   if (response.program == 'web') {
     $('#init-container').classList.add('hidden');
