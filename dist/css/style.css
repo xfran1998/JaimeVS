@@ -120,6 +120,25 @@ iframe {
     width: 100%;
 }
 
+#processing-container{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.processing-code-container{
+    width: 50vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border: #0471a3 solid 3px;
+}
+
 .hidden{
     display: none !important;
 }

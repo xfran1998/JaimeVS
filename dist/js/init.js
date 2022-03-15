@@ -15,7 +15,6 @@ $('#create-room').addEventListener('click', function (e) {
     $('#create-room-container').classList.remove('hidden');
 });
 
-
 // join room container
 $('#join-room').addEventListener('click', function (e) {
     // socket.emit('join_room');
@@ -40,9 +39,8 @@ $('#create-room-btn').addEventListener('click', function (e) {
       return;
     }
 
-    console.log('create room', room);
     if (room.length > 0) {
-      socket.emit('create_room', {room: room});
+      socket.emit('create_room', {room: room, program: option_program});
     }
 });
 
@@ -68,7 +66,7 @@ $('#join-room-btn').addEventListener('click', function (e) {
 
 // program option button
 $('#web-dev-btn').addEventListener('click', function (e) {
-  option_program = 'web-dev';
+  option_program = 'web';
 
   // hide all option buttons container
   $('#program-option-container').classList.add('hidden');
@@ -77,15 +75,13 @@ $('#web-dev-btn').addEventListener('click', function (e) {
   $('.create-name-room-container').classList.remove('hidden');
 });
 
-socket.on('enter_room', (response) => {
-  if (response.code >= 400){
-    alert(response.error);
-    return;
-  }
+// program option button
+$('#processing-btn').addEventListener('click', function (e) {
+  option_program = 'processing';
 
-  console.log('enter room', response);
-  $('#init-container').classList.add('hidden');
-  $('#editor-container').classList.remove('hidden');
-
-  setTimeout(initIframe, 1000);
+  // hide all option buttons container
+  $('#program-option-container').classList.add('hidden');
+  
+  // show create name room container
+  $('.create-name-room-container').classList.remove('hidden');
 });

@@ -3,17 +3,24 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 // const { randomInt } = require('crypto');
+const child_process = require('child_process');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const io = socketio(server);
 
+const frame_rate = 30;
+const premium_frame_rate = 60;
 const init_iframe_code = {
     html: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
     css: ["h1 {", '\tcolor: red;', "}"].join("\n"),
     js:  ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n")
 };
+const init_processing_code = {
+    processing: 'print("Hola Jaime");',
+}
 
 // Seteando carpeta estatica, carpeta donde contiene todos los datos que requiere el usuario cuando hace la peticion
 // a la web buscando recursos.
@@ -30,11 +37,6 @@ io.on('connection', (socket) => {
     console.log("Nueva conexion!!");
 
     socket.on("disconnecting", () => {
-        console.log("**** DISCONNECTING 1 ****");
-        console.log(socket.id);
-        console.log(socket_users);
-        console.log(socket_rooms);
-        console.log("**********************");
         // Deleting users
         if (socket_users[socket.id] == null) return; // check if user exists
         console.log('user exists');
@@ -53,11 +55,13 @@ io.on('connection', (socket) => {
         if (socket_rooms[room_id].length == 0) {
             delete socket_rooms[room_id];
         }
-        console.log("**** DISCONNECTING 2 ****");
-        console.log(socket.id);
-        console.log(socket_users);
-        console.log(socket_rooms);
-        console.log("**********************");
+
+        // DEBUG
+        // console.log("**** DISCONNECTING ****");
+        // console.log(socket.id);
+        // console.log(socket_users);
+        // console.log(socket_rooms);
+        // console.log("**********************");
     });   
 
     // msg to change code on server and other clients in the same room
@@ -76,14 +80,16 @@ io.on('connection', (socket) => {
     });
     
     // msg to set up client code at the beginning
-    socket.on('get_code_client', () => {
+    socket.on('get_code_client', (data) => {
         if (socket_users[socket.id] == null) return; // check if user exists
-        // ('get_code_server', iframe_code);
-        // emit only in the room of the client
+        
+        console.log(iframe_code_rooms[socket_users[socket.id].room]);
+
         socket.emit('get_code_server', iframe_code_rooms[socket_users[socket.id].room]);
     });
 
-    socket.on('create_room', data =>{
+    socket.on('create_room', data => {
+        console.log(data);
         // check if data room is valid
         if (data.room == null || data.room == "") {
             socket.emit('enter_room', {
@@ -102,22 +108,43 @@ io.on('connection', (socket) => {
             return;
         }
 
+        // check if program setted
+        if (data.program !== 'web' && data.program !== 'processing') {
+            socket.emit('enter_room', {
+                code: 405,
+                error: 'Program is invalid ( Web | Processing )',
+                message: data
+            });
+            return;
+        }
+
         // create room and join the user
         socket_rooms[data.room] = [];
         socket_rooms[data.room].push(socket.id);
+        socket_rooms[data.room].program = data.program;
+        
         socket_users[socket.id] = {
             room: data.room
         };
-
-        // create initial code
-        iframe_code_rooms[data.room] = init_iframe_code;
-
+        
+        // *** FOR WEB ***
+        if (data.program == 'web') {
+            // create initial code
+            iframe_code_rooms[data.room] = init_iframe_code;
+        }
+        // *** FOR PROCESSING ***
+        else if (data.program == 'processing') {
+            // create initial code
+            iframe_code_rooms[data.room] = init_processing_code;
+        }
+        
         // join the room
         socket.join(data.room);
 
         // send response to client
         socket.emit('enter_room', {
-            room: data.room
+            room: data.room,
+            program: data.program
         });
     });
 
@@ -155,4 +182,55 @@ io.on('connection', (socket) => {
     });
 });
 
+const interval_time = 1000/frame_rate;
+
+function run_script(command, args, cwd, time_out=null, callback) {
+    console.log("Starting Process.");
+    var child = child_process.spawn(command, args, cwd);
+
+    child.stdout.setEncoding('ascii');
+    child.stdout.on('data', function(data) {
+        callback(data);
+    });
+
+    child.stderr.setEncoding('ascii');
+    child.stderr.on('data', function(data) {
+        console.log("Error: " + data);
+    });
+
+    child.on('close', function() {
+        console.log('finish code: ' + child.exitCode);
+    });
+
+  if (time_out == null) {
+    child.kill();
+    console.log("Error no time setted of process child.");
+    return;
+  }
+
+    setTimeout(function() {
+        child.kill();
+        console.log("Process killed.");
+    }, time_out);
+}
+
 server.listen(PORT, () => {console.log(`runing on port ${PORT}`);});
+
+function run_code(){
+    var time_out = 10000; // 10 seconds
+
+    run_script(path.join(__dirname, 'Processing', 'processing-java.exe'), ["--force", `--sketch=${path.join(__dirname, 'temp', 'template')}`, `--output=${path.join(__dirname, 'temp', 'template','out')}`, "--run"], {cwd:`${path.join(__dirname, 'temp', 'template')}`}, time_out, function(buf) {
+        socket.emit('processing_output_server', buf);
+    });
+
+    // TODO: DISPLAY IMAGE, set it to room attribute so it can stopped later on
+    var int_display = setInterval(() => {
+        // read frame.svg from template/img_output
+        fs.readFile(path.join(__dirname, 'temp', 'template', 'img_output', 'frame.svg'), function(err, data) {
+            if (err) throw err;
+            console.log(data);
+            socket.emit('server_image', data);
+        });
+        // emit image to socket
+    }, interval_time);
+}
