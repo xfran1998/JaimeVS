@@ -356,6 +356,30 @@ socket.on('enter_room', (response) => {
 });
 
 
+// Processing
+let img = $('#img-processing');
+$('#run-btn').addEventListener('click', () => {
+	console.log('run-btn');
+	startProgram();
+});
+
+function startProgram(){
+	// console.log('startProgram');
+	// console.log(editor.processing.getValue());
+	socket.emit('start_program', {
+		code: editor.processing.getValue(),
+		id: 'processing'
+	});
+}
+
+// change image content
+socket.on('image_server', data => {
+	// console.log('image_server: ');
+	// console.log(data);
+	img.src = data.img;
+});
+
+
 // AUX
 let debounceTimer;
 function debounce (callback, time) {

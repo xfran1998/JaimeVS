@@ -5,6 +5,7 @@ const socketio = require('socket.io');
 // const { randomInt } = require('crypto');
 const child_process = require('child_process');
 const fs = require('fs');
+const fs_Extra = require('fs-extra');
 
 const app = express();
 const server = http.createServer(app);
@@ -54,6 +55,13 @@ io.on('connection', (socket) => {
         
         // if room is empty, delete room
         if (socket_rooms[room_id].length == 0) {
+            
+            if (socket_rooms[room_id].program == 'processing') {
+                // Delete folder of the room
+                fs.rmSync(socket_rooms[room_id].dir, { recursive: true, force: true });
+            }
+
+            
             delete socket_rooms[room_id];
         }
 
@@ -113,6 +121,16 @@ io.on('connection', (socket) => {
             return;
         }
 
+        // check if valid name for processing
+        if (data.program !== 'processing' && data.room == 'template') { // TODO: should migrate template folder to another name
+            socket.emit('enter_room', {
+                code: 406,
+                error: 'Room already exists',
+                message: data
+            });
+            return;
+        }
+
         // create room and join the user
         socket_rooms[data.room] = [];
         socket_rooms[data.room].push(socket.id);
@@ -139,6 +157,14 @@ io.on('connection', (socket) => {
             // iframe_code_rooms[data.room] = init_processing_code;
             console.log('Setting up processing code');
             console.log(init_processing_code);
+            
+            console.log('Creating folder for the room');
+            var dir_template = path.join(__dirname, 'temp', 'template');
+            var dir_room = path.join(__dirname, 'temp', data.room);
+            cloneFolder(dir_template, dir_room, data.room);
+            
+            socket_rooms[data.room].dir = dir_room;
+            console.log('Room folder created');
         }
         
         // join the room
@@ -184,14 +210,51 @@ io.on('connection', (socket) => {
             program: socket_rooms[data.room].program
         });
     });
+
+    socket.on('start_program', data => {
+        if (data.id !== 'processing') return;
+
+        // create a random string
+        console.log('running code');
+
+        var room_name = socket_users[socket.id].room;
+        run_code(socket, room_name);
+    });
 });
 
 const interval_time = 1000/frame_rate;
 
+function cloneFolder(source, target, room_name) {
+
+    // check if folder exists and create it if not
+    if (!fs.existsSync(target)){
+        fs.mkdirSync(target, { recursive: true });
+    }
+
+    // copy files from source to target
+    fs_Extra.copy(source, target, function(error) {
+        if (error) {
+            throw error;
+        } else {
+          console.log("success!");
+          // rename template.pde to (room name).pde
+            fs.renameSync(path.join(target, 'template.pde'), path.join(target, room_name + '.pde'));
+          console.log('room name: ' + room_name);
+          
+        }
+    });
+}
+
 function run_script(command, args, cwd, time_out=null, callback) {
     console.log("Starting Process.");
+    console.log("Command: " + command);
+    console.log("Args: " + args);
+    console.log("CWD: " + cwd);
+    console.log("Timeout: " + time_out);
+    
     var child = child_process.spawn(command, args, cwd);
-
+    console.log("Child created");
+    
     child.stdout.setEncoding('ascii');
     child.stdout.on('data', function(data) {
         callback(data);
@@ -220,21 +283,27 @@ function run_script(command, args, cwd, time_out=null, callback) {
 
 server.listen(PORT, () => {console.log(`runing on port ${PORT}`);});
 
-function run_code(){
+function run_code(socket, room_name){
     var time_out = 10000; // 10 seconds
 
-    run_script(path.join(__dirname, 'Processing', 'processing-java.exe'), ["--force", `--sketch=${path.join(__dirname, 'temp', 'template')}`, `--output=${path.join(__dirname, 'temp', 'template','out')}`, "--run"], {cwd:`${path.join(__dirname, 'temp', 'template')}`}, time_out, function(buf) {
+    run_script(path.join(__dirname, 'Processing', 'processing-java.exe'), ["--force", `--sketch=${path.join(__dirname, 'temp', room_name)}`, `--output=${path.join(__dirname, 'temp', room_name,'out')}`, "--run"], {cwd:`${path.join(__dirname, 'temp', room_name)}`}, time_out, function(buf) {
         socket.emit('processing_output_server', buf);
     });
 
     // TODO: DISPLAY IMAGE, set it to room attribute so it can stopped later on
     var int_display = setInterval(() => {
         // read frame.svg from template/img_output
-        fs.readFile(path.join(__dirname, 'temp', 'template', 'img_output', 'frame.svg'), function(err, data) {
-            if (err) throw err;
-            console.log(data);
-            socket.emit('server_image', data);
+        fs.readFile(path.join(__dirname, 'temp', room_name, 'img_output', 'frame.svg'), function(err, data) {
+            if (err) {console.log('image_error'); return;}
+            socket.emit('image_server', {img: data});
+            console.log('image sent');
         });
         // emit image to socket
     }, interval_time);
+
+    setTimeout(() => {
+        clearInterval(int_display);
+        console.log('display cleared');
+        socket.emit('processing_info_server', 'Processing finished');
+    }, time_out);
 }

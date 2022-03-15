@@ -228,3 +228,10 @@ iframe {
     height: fit-content;
     padding: 10px 15px;
 }
+
+#img-processing{
+    height: 95%;
+    width: 80%;
+    background-color: #f4f4f9;
+    border: 1px solid #dad5d5;
+}

@@ -13,6 +13,7 @@
   "dependencies": {
     "esm": "^3.2.25",
     "express": "^4.17.3",
+    "fs-extra": "^10.0.1",
     "monaco-editor": "0.32.1",
     "socket.io": "^4.4.1"
   }
