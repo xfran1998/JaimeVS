@@ -314,6 +314,7 @@ function run_code(socket, room_name){
         });
     }
     if (process.platform === 'linux') {
+        return;
         
         if (process.arch === 'arm64') {
             console.log('running on linux arm64');
