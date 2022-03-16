@@ -304,11 +304,21 @@ server.listen(PORT, () => {console.log(`runing on port ${PORT}`);});
 
 function run_code(socket, room_name){
     var time_out = 10000; // 10 seconds
+    console.log('running on: ', process.platform);
 
-    var child = run_script(path.join(__dirname, 'Processing', 'processing-java.exe'), ["--force", `--sketch=${path.join(__dirname, 'temp', room_name)}`, `--output=${path.join(__dirname, 'temp', room_name,'out')}`, "--run"], {cwd:`${path.join(__dirname, 'temp', room_name)}`}, time_out, function(buf) {
-        socket.emit('processing_output_server', buf);
-    });
-
+    if (process.platform === 'win32') {
+        console.log('running on windows');
+        var child = run_script(path.join(__dirname, 'Processing', 'win32', 'processing-java.exe'), ["--force", `--sketch=${path.join(__dirname, 'temp', room_name)}`, `--output=${path.join(__dirname, 'temp', room_name,'out')}`, "--run"], {cwd:`${path.join(__dirname, 'temp', room_name)}`}, time_out, function(buf) {
+            socket.emit('processing_output_server', buf);
+        });
+    }
+    if (process.platform === 'linux') {
+        console.log('running on linux');
+        var child = run_script(path.join(__dirname, 'Processing', 'linux', 'processing-java'), ["--force", `--sketch=${path.join(__dirname, 'temp', room_name)}`, `--output=${path.join(__dirname, 'temp', room_name,'out')}`, "--run"], {cwd:`${path.join(__dirname, 'temp', room_name)}`}, time_out, function(buf) {
+            socket.emit('processing_output_server', buf);
+        });
+    }
+        
     if (child == null)  return;
 
     // TODO: DISPLAY IMAGE, set it to room attribute so it can stopped later on
