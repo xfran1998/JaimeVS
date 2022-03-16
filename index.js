@@ -304,7 +304,8 @@ server.listen(PORT, () => {console.log(`runing on port ${PORT}`);});
 
 function run_code(socket, room_name){
     var time_out = 10000; // 10 seconds
-    console.log('running on: ', process.platform);
+    console.log('running platform: ', process.platform);
+    console.log('running arch: ', process.arch);
 
     if (process.platform === 'win32') {
         console.log('running on windows');
