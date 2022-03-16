@@ -357,7 +357,6 @@ socket.on('enter_room', (response) => {
 
 
 // Processing
-let img = $('#img-processing');
 $('#run-btn').addEventListener('click', () => {
 	console.log('run-btn');
 	startProgram();
@@ -372,12 +371,23 @@ function startProgram(){
 	});
 }
 
+var svg_container = $('#img-processing-svg');
+var img = new Image();
+
 // change image content
-socket.on('image_server', data => {
-	// console.log('image_server: ');
-	// console.log(data);
-	img.src = data.img;
+socket.on('image_server', svg_buffer => {
+	// console.log(svg_buffer);
+	if(svg_buffer.length <= 100) {
+		// console.log('Error: Image is too small');
+		return;
+	}
+
+	img.src = 'data:image/svg+xml;base64,' + svg_buffer;
+	svg_container.innerHTML = '';
+	svg_container.appendChild(img);
+
 });
+
 
 
 // AUX
@@ -386,3 +396,8 @@ function debounce (callback, time) {
   window.clearTimeout(debounceTimer);
   debounceTimer = window.setTimeout(callback, time);
 };
+
+socket.on('processing_output_server', (data) => {
+	console.log('processing_output_server');
+	console.log(data);
+});

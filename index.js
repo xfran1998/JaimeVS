@@ -6,6 +6,7 @@ const socketio = require('socket.io');
 const child_process = require('child_process');
 const fs = require('fs');
 const fs_Extra = require('fs-extra');
+var kill = require('tree-kill');
 
 const app = express();
 const server = http.createServer(app);
@@ -21,8 +22,26 @@ const init_iframe_code = {
     js:  ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n")
 };
 const init_processing_code = {
-    processing: 'print("Hola Jaime");',
+    processing: '',
 }
+
+// AUX
+let debounceTimer;
+function debounce (callback, time) {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(callback, time);
+};
+
+// defining processing init_processing_code getting from template.pde
+function get_init_processing() {
+    // read temp/template/template.pde code and change processing code
+    fs.readFile(path.join(__dirname, 'temp', 'template', 'template.pde'), function(err, data) {
+        if (err) throw err;
+        init_processing_code.processing = data.toString();
+    });
+}
+
+get_init_processing();
 
 // Seteando carpeta estatica, carpeta donde contiene todos los datos que requiere el usuario cuando hace la peticion
 // a la web buscando recursos.
@@ -240,7 +259,6 @@ function cloneFolder(source, target, room_name) {
           // rename template.pde to (room name).pde
             fs.renameSync(path.join(target, 'template.pde'), path.join(target, room_name + '.pde'));
           console.log('room name: ' + room_name);
-          
         }
     });
 }
@@ -251,6 +269,11 @@ function run_script(command, args, cwd, time_out=null, callback) {
     console.log("Args: " + args);
     console.log("CWD: " + cwd);
     console.log("Timeout: " + time_out);
+
+    if (time_out == null) {
+        console.log("Error no time setted of process child.");
+        return;
+      }
     
     var child = child_process.spawn(command, args, cwd);
     console.log("Child created");
@@ -269,16 +292,12 @@ function run_script(command, args, cwd, time_out=null, callback) {
         console.log('finish code: ' + child.exitCode);
     });
 
-  if (time_out == null) {
-    child.kill();
-    console.log("Error no time setted of process child.");
-    return;
-  }
+    // setTimeout( () => {
+    //     kill(child.pid);
+    //     console.log("Process killed.");
+    // }, time_out);
 
-    setTimeout(function() {
-        child.kill();
-        console.log("Process killed.");
-    }, time_out);
+    return child;
 }
 
 server.listen(PORT, () => {console.log(`runing on port ${PORT}`);});
@@ -286,24 +305,39 @@ server.listen(PORT, () => {console.log(`runing on port ${PORT}`);});
 function run_code(socket, room_name){
     var time_out = 10000; // 10 seconds
 
-    run_script(path.join(__dirname, 'Processing', 'processing-java.exe'), ["--force", `--sketch=${path.join(__dirname, 'temp', room_name)}`, `--output=${path.join(__dirname, 'temp', room_name,'out')}`, "--run"], {cwd:`${path.join(__dirname, 'temp', room_name)}`}, time_out, function(buf) {
+    var child = run_script(path.join(__dirname, 'Processing', 'processing-java.exe'), ["--force", `--sketch=${path.join(__dirname, 'temp', room_name)}`, `--output=${path.join(__dirname, 'temp', room_name,'out')}`, "--run"], {cwd:`${path.join(__dirname, 'temp', room_name)}`}, time_out, function(buf) {
         socket.emit('processing_output_server', buf);
     });
+
+    if (child == null)  return;
 
     // TODO: DISPLAY IMAGE, set it to room attribute so it can stopped later on
     var int_display = setInterval(() => {
         // read frame.svg from template/img_output
         fs.readFile(path.join(__dirname, 'temp', room_name, 'img_output', 'frame.svg'), function(err, data) {
-            if (err) {console.log('image_error'); return;}
-            socket.emit('image_server', {img: data});
-            console.log('image sent');
+            if (err) {
+                // if still not sending image reset all finish timers, so it's time_out when start sending image to the client
+                debounce(() => {
+                    // kill process
+                    kill(child.pid);
+                    console.log("Process killed.");
+
+                    // stop sending frames to client
+                    clearInterval(int_display);
+                    console.log('display cleared');
+                    socket.emit('processing_info_server', 'Processing finished');
+
+                }, time_out);
+                // console.log('Reset timeout');
+                return;
+            }
+            // covert to base64
+            var base64data = new Buffer(data).toString('base64');
+            // console.log('sent');
+            socket.emit('image_server', base64data);
         });
         // emit image to socket
     }, interval_time);
 
-    setTimeout(() => {
-        clearInterval(int_display);
-        console.log('display cleared');
-        socket.emit('processing_info_server', 'Processing finished');
-    }, time_out);
+    
 }
