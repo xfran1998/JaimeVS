@@ -40,7 +40,11 @@ $('#create-room-btn').addEventListener('click', function (e) {
     }
 
     if (room.length > 0) {
-      socket.emit('create_room', {room: room, program: option_program});
+      socket.emit('create_room', {
+        room: room, 
+        program: option_program,
+        user_type: 'user',
+      });
     }
 });
 
@@ -59,7 +63,10 @@ $('#join-room-btn').addEventListener('click', function (e) {
 
   console.log('join room', {room: room});
   if (room.length > 0) {
-    socket.emit('join_room', {room: room});
+    socket.emit('join_room', {
+      room: room,
+      user_type: 'user',
+    });
   }
 });
 
