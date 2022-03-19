@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>browser-amd-editor</title>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 		<link rel="stylesheet" href="css/style.css">
-        <script src="https://kit.fontawesome.com/b854f11bc3.js" crossorigin="anonymous"></script>
-        <title>browser-amd-editor</title>
     </head>
     <body>
         <div id="init-container">
@@ -45,24 +44,11 @@
             <div class="code-container" id="js"></div>    
             <iframe id="iframe-res"></iframe>
         </div>
-
-        <!-- Processing -->
         <div class="hidden" id="processing-container">
-            <div class="header">
-                <h1>Processing</h1>
-                <div class="buttons">
-                    <button id="run-btn"><i class="fa-solid fa-play"></i></button>
-                    <button id="stop-btn"><i class="fa-solid fa-stop"></i></button>
-                </div>                
-            </div>
-            <div class="body">
-                <div class="processing-code-container" id="processing-editor"></div>
-                <div class="processing-code-container">
-                    <div class="processing-code-container" id="output" placeholder="OUTPUT"></div>
-                    <div class="processing-code-container" id="processing-img-wrapper"><div id="img-processing-svg"></div></div>
-                    <!-- <div class="processing-code-container" id="processing-img-wrapper"><svg id="img-processing-svg" xmlns="http://www.w3.org/2000/svg"></svg></div> -->
-                    <!-- <div class="processing-code-container" id="processing-img-wrapper"><canvas  id="img-processing"></canvas></div> -->
-                </div>
+            <div class="processing-code-container" id="processing"></div>
+            <div class="processing-code-container">
+                <div class="processing-code-container" id="output" placeholder="OUTPUT"></div>
+                <div class="processing-code-container" id="processing-img-wrapper"></div>
             </div>
         </div>
 

@@ -115,7 +115,7 @@ iframe {
     height: 35vh;
 }
 
-.code-container > div , .processing-code-container > div{
+.code-container > div {
     height: 100%;
     width: 100%;
 }
@@ -126,111 +126,21 @@ iframe {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
     overflow: hidden;
 }
 
 .processing-code-container{
-    width: 50%;
-    min-height: 100%;
+    width: 50vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    border: #0471a3 solid 3px;
 }
 
 .hidden{
     display: none !important;
 }
 
-.header{
-    width: 100%;
-    height: 70px;
-    background-color: #0471a3;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    color: #fff;
-    font-size: 1.2rem;
-    font-weight: 400;
-}
 
-.body{
-    width: 100%;
-    height: calc(100% - 70px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f4f4f9;
-}
-
-#processing-editor{
-    border-right: #0471a3 solid 3px;
-    background-color: #fffffe;
-}
-
-#processing-editor .monaco-editor{
-    padding-top: 10px;
-}
-
-#output{
-    border-bottom: #0471a3 solid 3px;
-}
-
-#processing-container .buttons{
-    min-height: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    color: #0471a3;
-}
-
-#processing-container .buttons > button {
-    color: #0471a3;
-    border: none;
-    margin: 15px;
-    padding: 10px 15px;
-    border-radius: 5px;
-    background-color: #e4e9e2;
-    font-size: 1.2rem;
-    font-weight: 400;
-    cursor: pointer;
-    transition: all 0.5s ease;
-}
-
-.body .processing-code-container > .processing-code-container{
-    height: calc(50vh - 30px);
-    position: relative;
-}
-
-#output::after{
-    content: 'Output';
-    position: absolute;
-    font-size: 1.2rem;
-    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    top: 1px;
-    left: 1px;
-    width: fit-content;
-    height: fit-content;
-    padding: 10px 15px;
-}
-
-#img-processing-svg{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#processing-img-wrapper::after{
-    content: 'Streaming';
-    position: absolute;
-    font-size: 1.2rem;
-    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    top: 1px;
-    left: 1px;
-    width: fit-content;
-    height: fit-content;
-    padding: 10px 15px;
-}
