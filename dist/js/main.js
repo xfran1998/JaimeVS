@@ -281,7 +281,7 @@ function createCodeEditorContainers(){
 			};
 
 			editor.processing.onDidChangeModelContent((e)=>{ 
-				editor.processing.setPosition({lineNumber:10, column:2}); 
+				// editor.processing.setPosition({lineNumber:10, column:2}); 
 				// console.log('MODEL');
 				// console.log({lastPosition});
 				// editor.processing.focus(); 
@@ -289,7 +289,7 @@ function createCodeEditorContainers(){
 			
 			editor.processing.onDidChangeCursorPosition(e => {
 				// console.log('CURSOR');
-				lastPosition = editor.processing.getPosition();
+				 lastPosition = editor.processing.getPosition();
 				// console.log('Cursor changed', editor.processing.getPosition());
 			});
 		});

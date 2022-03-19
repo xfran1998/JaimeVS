@@ -6,7 +6,7 @@ const socketio = require('socket.io');
 const child_process = require('child_process');
 const fs = require('fs');
 const fs_Extra = require('fs-extra');
-var kill = require('tree-kill');
+const kill = require('tree-kill');
 
 const app = express();
 const server = http.createServer(app);
@@ -129,7 +129,7 @@ io.on('connection', (socket) => {
         if (data.room == null || data.room == "") {
             socket.emit('error', {
                 code: 400,
-                error: 'Room name is invalid'
+                info: 'Room name is invalid'
             });
             return;
         }
@@ -138,7 +138,7 @@ io.on('connection', (socket) => {
         if (socket_rooms[data.room] != null) {
             socket.emit('error', {
                 code: 402,
-                error: 'Room already exists'
+                info: 'Room already exists'
             });
             return;
         }
@@ -147,7 +147,7 @@ io.on('connection', (socket) => {
         if (data.program !== 'web' && data.program !== 'processing') {
             socket.emit('error', {
                 code: 405,
-                error: 'Program is invalid ( Web | Processing )',
+                info: 'Program is invalid ( Web | Processing )',
                 message: data
             });
             return;
@@ -157,7 +157,7 @@ io.on('connection', (socket) => {
         if (data.program !== 'processing' && data.room == 'template') { // TODO: should migrate template folder to another name
             socket.emit('error', {
                 code: 406,
-                error: 'Room already exists',
+                info: 'Room already exists',
                 message: data
             });
             return;
@@ -167,7 +167,7 @@ io.on('connection', (socket) => {
         if (data.user_type !== 'user' && data.user_type !== 'img_user') {
             socket.emit('error', {
                 code: 407,
-                error: 'User type is invalid, refresh the page and try again',
+                info: 'User type is invalid, refresh the page and try again',
                 message: data
             });
             return;
@@ -226,7 +226,7 @@ io.on('connection', (socket) => {
         if (data.room == null || data.room == "") {
             socket.emit('error', {
                 code: 400,
-                error: 'Room name is invalid'
+                info: 'Room name is invalid'
             });
             return;
         }
@@ -235,7 +235,7 @@ io.on('connection', (socket) => {
         if (socket_rooms[data.room] == null) {
             socket.emit('error', {
                 code: 401,
-                error: 'Room does not exists'
+                info: 'Room does not exists'
             });
             return;
         }
@@ -243,43 +243,51 @@ io.on('connection', (socket) => {
         // join the user
         socket_rooms[data.room].push(socket.id);
         socket_users[socket.id] = {
-            room: data.room
+            room: data.room,
+            user_type: data.user_type
         };
+
+        console.log('New user!');
+        console.log(data);
 
         socket.join(data.room);
           // send response to client
-          socket.emit('error', {
+          socket.emit('enter_room', {
             code: 200,
             room: data.room,
             program: socket_rooms[data.room].program
         });
     });
-
-    socket.on('run_code', data => {
+    
+    socket.on('run_code_client', data => {
         var room_name = socket_users[socket.id].room;
 
         if (socket_rooms[room_name].program != 'processing') {
             socket.emit('error', {
                 code: 403,
-                error: 'Program is not processing'
+                info: 'Program is not processing'
             });
             return;
         };
         
         // check if img_user is in the room
-        var img_user_room = null;
+        var img_user_room_id = null;
         for (var i = 0; i < socket_rooms[room_name].length; i++) {
             if (socket_users[socket_rooms[room_name][i]].user_type == 'img_user') {
-                img_user_room = socket_users[socket_rooms[room_name][i]];
+                img_user_room_id = socket_rooms[room_name][i];
+                console.log('break');
                 break;
             }
         }
+        console.log('id img_user_room: ' + img_user_room_id);
 
-        if (img_user_room == null) {
+        if (img_user_room_id == null) {
             socket.emit('error', {
                 code: 409,
-                error: 'There is no client running the code in the room'
+                info: 'There is no client running the code in the room'
             });
+            console.log(socket_rooms);
+            console.log(socket_users);
             return;
         }
 
@@ -287,14 +295,9 @@ io.on('connection', (socket) => {
         console.log('running code');
 
         // send code to img_user only
-        io.to(img_user_room).emit('run_code', {
+        io.to(img_user_room_id).emit('run_code_server', {
             code: data.code,
         });
-
-        //second option
-        // io.sockets.socket(img_user_room).emit('run_code_server', {
-        //     code: data.code,
-        // });
 
         // var room_name = socket_users[socket.id].room;
         // run_code(socket, room_name);
@@ -313,7 +316,6 @@ io.on('connection', (socket) => {
     socket.on('processing_output_client', output => {
         socket.broadcast.to(socket_users[socket.id].room).emit('processing_output_server', output);
     });
-
 });
 
 const interval_time = 1000/frame_rate;
