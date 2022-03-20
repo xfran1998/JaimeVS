@@ -178,7 +178,7 @@ iframe {
     border-bottom: #0471a3 solid 3px;
     display: inline-block;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     padding-bottom: 10px;
     padding-left: 10px;
 }
@@ -215,7 +215,7 @@ iframe {
     position: absolute;
     font-size: 1.2rem;
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    top: -30px;
+    top: -60px;
     left: 1px;
     width: fit-content;
     height: fit-content;
@@ -228,7 +228,7 @@ iframe {
 }
 
 #processing-output:hover:after{
-    top: 1px;
+    top: 10px;
 }
 
 #img-processing-svg{
@@ -237,12 +237,16 @@ iframe {
     justify-content: center;
 }
 
+#processing-img-wrapper{
+    overflow: hidden;
+}
+
 #processing-img-wrapper::after{
     content: 'Streaming';
     position: absolute;
     font-size: 1.2rem;
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    top: -30px;
+    top: -60px;
     left: 1px;
     width: fit-content;
     height: fit-content;
@@ -255,5 +259,5 @@ iframe {
 }
 
 #processing-img-wrapper:hover:after{
-    top: 1px;
+    top: 10px;
 }
