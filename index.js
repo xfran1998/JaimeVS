@@ -263,6 +263,8 @@ io.on('connection', (socket) => {
     });
     
     socket.on('run_code_client', data => {
+        if (socket_users[socket.id] == null) return;
+        
         var room_name = socket_users[socket.id].room;
 
         if (socket_rooms[room_name].program != 'processing') {
@@ -307,16 +309,19 @@ io.on('connection', (socket) => {
     });
 
     socket.on('stop_code_client', () => {
+        if (socket_users[socket.id] == null) return;
         socket.broadcast.to(socket_users[socket.id].room).emit('stop_code_server');
     });
-
+    
     // redirecting image from img_user to clients connected to the same room
     socket.on('image_client', img => {
+        if (socket_users[socket.id] == null) return;
         socket.broadcast.to(socket_users[socket.id].room).emit('image_server', img);
     });
-
+    
     // redirecting output from img_user to clients connected to the same room
     socket.on('processing_output_client', output => {
+        if (socket_users[socket.id] == null) return;
         socket.broadcast.to(socket_users[socket.id].room).emit('processing_output_server', output);
     });
 });
