@@ -411,6 +411,7 @@ function run_code(socket, room_name){
         // read frame.svg from template/img_output
         fs.readFile(path.join(__dirname, 'temp', room_name, 'img_output', 'frame.svg'), function(err, data) {
             if (err) {
+                console.log('Error reading file: ' + err);
                 // if still not sending image reset all finish timers, so it's time_out when start sending image to the client
                 debounce(() => {
                     // kill process
@@ -421,9 +422,12 @@ function run_code(socket, room_name){
                     clearInterval(int_display);
                     console.log('display cleared');
                     socket.emit('processing_info_server', 'Processing finished');
-
+                    
                 }, time_out);
-                // console.log('Reset timeout');
+                
+                // clearInterval(int_display);
+                // console.log('display cleared becouse error occured');
+                // stop interval
                 return;
             }
             // covert to base64

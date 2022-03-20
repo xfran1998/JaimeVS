@@ -176,6 +176,11 @@ iframe {
 
 #processing-output{
     border-bottom: #0471a3 solid 3px;
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding-bottom: 10px;
+    padding-left: 10px;
 }
 
 #processing-container .buttons{
@@ -205,16 +210,25 @@ iframe {
     position: relative;
 }
 
-#processing-output::after{
+#processing-output::after:hover{
     content: 'Output';
     position: absolute;
     font-size: 1.2rem;
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    top: 1px;
+    top: -30px;
     left: 1px;
     width: fit-content;
     height: fit-content;
     padding: 10px 15px;
+    transition: all 0.5s ease;
+    background-color: #0471a3;
+    border: #66cfff solid 2px;
+    border-radius: 5px;
+    color: #fff;
+}
+
+#processing-output::after:hover{
+    top: 1px;
 }
 
 #img-processing-svg{
@@ -228,9 +242,18 @@ iframe {
     position: absolute;
     font-size: 1.2rem;
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    top: 1px;
+    top: -30px;
     left: 1px;
     width: fit-content;
     height: fit-content;
     padding: 10px 15px;
+    background-color: #0471a3;
+    border: #66cfff solid 2px;
+    border-radius: 5px;
+    color: #fff;
+}
+
+#processing-img-wrapper::after{
+    transition: all 0.5s ease;
+    top: 1px;
 }
