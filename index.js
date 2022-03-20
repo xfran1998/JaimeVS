@@ -25,6 +25,9 @@ const init_processing_code = {
     processing: '',
 }
 
+// heroku logs: heroku logs -t --app code-jaime-online
+// heroku log error: heroku logs --tail 500 --app code-jaime-online o heroku logs -n 500 --app code-jaime-online
+
 // AUX
 let debounceTimer;
 function debounce (callback, time) {

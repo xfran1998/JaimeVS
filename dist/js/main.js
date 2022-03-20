@@ -402,6 +402,7 @@ function debounce (callback, time) {
 socket.on('processing_output_server', (data) => {
 	console.log('processing_output_server');
 	console.log(data);
+	$('#processing-output').innerHTML += `<p>${data}</p>`;
 });
 
 socket.on('error',(error) => {
