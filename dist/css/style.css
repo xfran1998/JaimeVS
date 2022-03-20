@@ -210,7 +210,7 @@ iframe {
     position: relative;
 }
 
-#processing-output::after:hover{
+#processing-output::after{
     content: 'Output';
     position: absolute;
     font-size: 1.2rem;
@@ -227,7 +227,7 @@ iframe {
     color: #fff;
 }
 
-#processing-output::after:hover{
+#processing-output:hover:after{
     top: 1px;
 }
 
@@ -251,9 +251,9 @@ iframe {
     border: #66cfff solid 2px;
     border-radius: 5px;
     color: #fff;
+    transition: all 0.5s ease;
 }
 
-#processing-img-wrapper::after{
-    transition: all 0.5s ease;
+#processing-img-wrapper:hover:after{
     top: 1px;
 }
