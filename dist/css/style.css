@@ -132,7 +132,7 @@ iframe {
 
 .processing-code-container{
     width: 50%;
-    min-height: 100%;
+    max-height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;

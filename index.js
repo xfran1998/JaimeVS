@@ -13,7 +13,7 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const io = socketio(server);
 
-const frame_rate = 30;
+const frame_rate = 144;
 const premium_frame_rate = 60;
 
 const init_iframe_code = {
