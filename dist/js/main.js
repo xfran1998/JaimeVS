@@ -389,7 +389,7 @@ socket.on('image_server', svg_buffer => {
 	img.src = 'data:image/svg+xml;base64,' + svg_buffer;
 	svg_container.innerHTML = '';
 	svg_container.appendChild(img);
-
+	console.log('image recieved');
 });
 
 // AUX
