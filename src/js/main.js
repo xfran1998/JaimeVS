@@ -21,99 +21,88 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import * as MonacoCollabExt from "@convergencelabs/monaco-collab-ext";
 import socket from './init.js';
 import {option_program} from './init.js';
+const editors = {};
 
-// import css from "/src/example.css";
-
-  //
+function createEditor(editor, id_div, value, lenguage, user){
+	//
   // Create the target editor where events will be played into.
   //
 	console.log(monaco.editor);
-  const target = monaco.editor.create(document.getElementById("target-editor"), {
-    value: 'test',
+	editor[editor] = {};
+  editor[editor].editor = createCodeEditor(id_div, value, lenguage);
+	editor[editor].cursorManager = createCursorManagerEditor(editor[editor].editor);
+	editor[editor].cursor = createCursor(editor[editor].cursorManager, user);
+}
+
+function createCodeEditor(id_div, value, lenguage){
+	return monaco.editor.create(document.getElementById(id_div), {
+    value: value,
     theme: "vs-dark'",
-    language: 'javascript',
+    language: lenguage,
     readOnly: false
   });
+}
 
-  const remoteCursorManager = new MonacoCollabExt.RemoteCursorManager({
+function createCursorManagerEditor(editor) {
+	return new MonacoCollabExt.RemoteCursorManager({
     editor: target,
     tooltips: true,
     tooltipDuration: 2
   });
+}
+
+function addCursor(cursorManager, user){
+	return cursorManager.addCursor(user.id, user.color, user.label);
+}
+
+function createSelectorManagerEditor(editor){
+	return new MonacoCollabExt.RemoteSelectionManager({editor: editor});
+}
+
+function addSelectorEditor(editor){
+	return remoteSelectionManager.addSelection(sourceUser.id, sourceUser.color, sourceUser.label);
+}
+
   
-  const sourceUserCursor = remoteCursorManager.addCursor(sourceUser.id, sourceUser.color, sourceUser.label);
-
-  const remoteSelectionManager = new MonacoCollabExt.RemoteSelectionManager({editor: target});
-  remoteSelectionManager.addSelection(sourceUser.id, sourceUser.color, sourceUser.label);
-
-
-  const targetContentManager = new MonacoCollabExt.EditorContentManager({
-    editor: target
-  });
-
-
-  //
+function createOriginEditor(container){
+	  //
   // Create the source editor were events will be generated.
   //
-  const source = monaco.editor.create(document.getElementById("source-editor"), {
-    value: 'test',
+  const source = monaco.editor.create(document.getElementById(container), {
+    value: 'editorContents',
     theme: "vs-dark'",
     language: 'javascript'
   });
 
-
   source.onDidChangeCursorPosition(e => {
     const offset = source.getModel().getOffsetAt(e.position);
-    sourceUserCursor.setOffset(offset);
+    // sourceUserCursor.setOffset(offset);
+		console.log('onDidChangeCursorPosition: ' + offset);
   });
 
   source.onDidChangeCursorSelection(e => {
     const startOffset = source.getModel().getOffsetAt(e.selection.getStartPosition());
     const endOffset = source.getModel().getOffsetAt(e.selection.getEndPosition());
-    remoteSelectionManager.setSelectionOffsets(sourceUser.id, startOffset, endOffset);
+    //remoteSelectionManager.setSelectionOffsets(sourceUser.id, startOffset, endOffset);
+		console.log('onDidChangeCursorSelection: ' + startOffset + ' ' + endOffset);
   });
 
   const sourceContentManager = new MonacoCollabExt.EditorContentManager({
     editor: source,
     onInsert(index, text) {
-      // target.updateOptions({readOnly: false});
-      targetContentManager.insert(index, text);
-      // target.updateOptions({readOnly: true});
+      //targetContentManager.insert(index, text);
+			console.log('insert');
     },
     onReplace(index, length, text) {
-      // target.updateOptions({readOnly: false});
-      targetContentManager.replace(index, length, text);
-      // target.updateOptions({readOnly: true});
+      // targetContentManager.replace(index, length, text);
+			console.log('replace');
     },
     onDelete(index, length) {
-      // target.updateOptions({readOnly: false});
-      targetContentManager.delete(index, length);
-      // target.updateOptions({readOnly: true});
+      // targetContentManager.delete(index, length);
+			console.log('delete');
     }
   });
-
-  
-  const originCursorManager = new MonacoCollabExt.RemoteCursorManager({
-    editor: source,
-    tooltips: true,
-    tooltipDuration: 2
-  });
-
-  const staticUserCursor = originCursorManager.addCursor(staticUser.id, staticUser.color, staticUser.label);
-
-  const sourceSelectionManager = new MonacoCollabExt.RemoteSelectionManager({editor: source});
-  sourceSelectionManager.addSelection(staticUser.id, staticUser.color, staticUser.label);
-
-   //
-  // Faked other user.
-  //
-  staticUserCursor.setOffset(50);
-  sourceSelectionManager.setSelectionOffsets(staticUser.id, 40, 50);
-
-  window.addEventListener('resize', () => {
-    source.layout();
-    target.layout();
-  });
+}
 
 var UPDATE_RATE = 0; // each 5000 will update if the code has not been changed in more than 5000 ms
 var iframe = $("#iframe-res");
@@ -121,7 +110,7 @@ var lastPosition = {column: 0,	lineNumber: 0};
 
 var iframe_code = {};
 var editor = {};
-
+/*
 function getCodeFromEditor(id) {
 	if (editor[id] == null) return "<h1>Error, editor not found</h1>";
 
@@ -149,10 +138,6 @@ function setCodeFromEditor(id, code) {
 
 	if(code !== editor[id].getValue())
 		editor[id].setValue(code);
-}
-
-function initIframe() {
-	socket.emit("get_code_client");
 }
 
 function createCodeEditor() {
@@ -413,15 +398,22 @@ function createCodeEditorContainers(){
 	alert("Error, Code Editor type not found");
 }
 
+*/
+
+function initIframe() {
+	socket.emit("get_code_client");
+}
+
 socket.on('server_code', data => {
 	// console.log('server_code: ');
 	// console.log(data);
-	if (editor[data.id] == null) return;
+	
+	/*if (editor[data.id] == null) return;
 	
 	setCodeFromEditor(data.id, data.code); // change editor
 
 	if (option_program == 'web')
-		updateIframe();
+		updateIframe();*/
 });
 
 socket.on('get_code_server', data => {
@@ -430,7 +422,7 @@ socket.on('get_code_server', data => {
 	// console.log('**************')
 	
 	// iterate through editor objects
-	for (var key in data) {
+	/*for (var key in data) {
 		// console.log('key: ' + key);
 		setCodeFromEditor(key, data[key]); // change editor
 	}
@@ -438,29 +430,47 @@ socket.on('get_code_server', data => {
 	// console.log('**************')
 	
 	if (option_program == 'web')
-		updateIframe();
+		updateIframe();*/
 });
 
 
 socket.on('enter_room', (response) => {
 	console.log('option_program: ' + option_program);
   // console.log('enter room', response);
-
-  if (option_program == 'web') {
-    $('#init-container').classList.add('hidden');
+	
+  /*if (option_program == 'web') {
+		$('#init-container').classList.add('hidden');
     $('#editor-container').classList.remove('hidden');
     setTimeout(initIframe, 1000);
 		UPDATE_RATE = 3000; // Update rate for JS iframe
 		createCodeEditor();
   }
   else if (option_program == 'processing') {
-    $('#init-container').classList.add('hidden');
+		$('#init-container').classList.add('hidden');
     $('#processing-container').classList.remove('hidden');
     setTimeout(initIframe, 1000);
 		createCodeEditor();
   }
   else
-    alert('Unexpected error, reload the page and try again');
+	alert('Unexpected error, reload the page and try again');*/
+	if (option_program == 'web') {
+			$('#init-container').classList.add('hidden');
+			$('#editor-container').classList.remove('hidden');
+			setTimeout(initIframe, 1000);
+			createOriginEditor('html');
+			createOriginEditor('css');
+			createOriginEditor('js');
+			UPDATE_RATE = 3000; // Update rate for JS iframe
+			// createCodeEditor();
+		}
+		else if (option_program == 'processing') {
+			$('#init-container').classList.add('hidden');
+			$('#processing-container').classList.remove('hidden');
+			setTimeout(initIframe, 1000);
+			// createCodeEditor();
+		}
+		else
+			alert('Unexpected error, reload the page and try again');
 });
 
 
@@ -476,8 +486,7 @@ $('#stop-btn').addEventListener('click', () => {
 });
 
 function startProgram(){
-	// console.log('startProgram');
-	// console.log(editor.processing.getValue());
+	// run the processing program inside the editor
 	socket.emit('run_code_client', {
 		code: editor.processing.getValue()
 	});
