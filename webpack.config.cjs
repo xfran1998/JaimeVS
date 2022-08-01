@@ -4,9 +4,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
 	mode: 'development',
-	entry: ['./src/js/main.js', './src/js/init.js', './src/index.html', './src/css/style.css'],
+	entry: ['./src/js/main.js', './src/js/init.js'],
 	output: {
-		path: path.resolve(__dirname, 'dist'),
+		path: path.resolve(__dirname, 'dist', 'js'),
 		filename: '[name].js'
 	},
 	module: {
@@ -24,10 +24,6 @@ module.exports = {
 	plugins: [
 		new MonacoWebpackPlugin({
 			languages: ['typescript', 'javascript', 'css']
-		}),
-		new HtmlWebpackPlugin({
-			template: './src/index.html',
-			filename: './index.html'
 		})
 	]
 };

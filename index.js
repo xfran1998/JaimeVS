@@ -162,6 +162,8 @@ io.on('connection', (socket) => {
 
         // check if room exists
         if (socket_rooms[data.room] != null) {
+            console.log('room exists');
+            console.log(socket_rooms[data.room]);
             socket.emit('error', {
                 code: 402,
                 info: 'Room already exists'

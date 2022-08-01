@@ -1,8 +1,7 @@
-// import io from 'socket.io-client';
 // import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
-// import io from socket.io cdn
-
-console.log(io);
+const socket = io();
+console.log(socket);
+console.log('hello');
 
 // const socket = io();
 const $ = selector => document.querySelector(selector);
@@ -98,3 +97,6 @@ $('#processing-btn').addEventListener('click', function (e) {
   // show create name room container
   $('.create-name-room-container').classList.remove('hidden');
 });
+
+export default socket;
+export {option_program};

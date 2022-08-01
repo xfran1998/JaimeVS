@@ -19,6 +19,9 @@ const $$ = selector => document.querySelectorAll(selector);
 
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import * as MonacoCollabExt from "@convergencelabs/monaco-collab-ext";
+import socket from './init.js';
+import {option_program} from './init.js';
+
 // import css from "/src/example.css";
 
   //
@@ -161,6 +164,7 @@ function createCodeEditor() {
 }
 
 function setListenersForCodeEditor() {
+	console.log('option_program: ' + option_program);
 	if (option_program == 'web'){
 		// addEventListener keyup will trigger when client press a key on editor 1
 		$("#html").addEventListener("keyup", function (e) {
@@ -439,17 +443,17 @@ socket.on('get_code_server', data => {
 
 
 socket.on('enter_room', (response) => {
-	option_program = response.program;
+	console.log('option_program: ' + option_program);
   // console.log('enter room', response);
 
-  if (response.program == 'web') {
+  if (option_program == 'web') {
     $('#init-container').classList.add('hidden');
     $('#editor-container').classList.remove('hidden');
     setTimeout(initIframe, 1000);
 		UPDATE_RATE = 3000; // Update rate for JS iframe
 		createCodeEditor();
   }
-  else if (response.program == 'processing') {
+  else if (option_program == 'processing') {
     $('#init-container').classList.add('hidden');
     $('#processing-container').classList.remove('hidden');
     setTimeout(initIframe, 1000);
@@ -526,3 +530,17 @@ socket.on('error',(error) => {
 		return;
 	}
 });
+
+
+const MAX_PERS = 7;
+let num_pers = 7;
+
+if (num_pers < MAX_PERS) {
+	console.log('Pueden entrar mas personas');
+}
+else if (num_pers > MAX_PERS) {
+	console.log('Más personas que las que caben!!');
+}
+else{
+	console.log('Capacidad máxima alcanzada');
+}
