@@ -1,4 +1,10 @@
-const socket = io();
+// import io from 'socket.io-client';
+// import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
+// import io from socket.io cdn
+
+console.log(io);
+
+// const socket = io();
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
 

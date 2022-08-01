@@ -1,11 +1,13 @@
 {
+  "type": "module",
   "name": "vscode_online",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "node ./node_modules/webpack/bin/webpack.js --progress --watch"
   },
   "keywords": [],
   "author": "",
@@ -14,9 +16,20 @@
     "esm": "^3.2.25",
     "express": "^4.17.3",
     "fs-extra": "^10.0.1",
-    "monaco-editor": "0.32.1",
+    "monaco-editor": "^0.33.0",
+    "monaco-editor-webpack-plugin": "^7.0.1",
     "sharp": "^0.30.3",
     "socket.io": "^4.4.1",
+    "socket.io-client": "^4.5.1",
     "tree-kill": "^1.2.2"
+  },
+  "devDependencies": {
+    "@convergencelabs/monaco-collab-ext": "^0.3.2",
+    "css-loader": "^6.7.1",
+    "html-loader": "^4.1.0",
+    "html-webpack-plugin": "^5.5.0",
+    "source-map-loader": "^4.0.0",
+    "style-loader": "^3.3.1",
+    "webpack-cli": "^4.10.0"
   }
 }

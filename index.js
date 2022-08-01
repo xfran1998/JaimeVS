@@ -1,4 +1,4 @@
-const path = require('path');
+/*const path = require('path');
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
@@ -11,7 +11,30 @@ const kill = require('tree-kill');
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
-const io = socketio(server);
+const io = socketio(server);*/
+import path from 'path';
+import express from 'express';
+import http from 'http';
+import * as socketio from 'socket.io';
+// import { randomInt } from 'crypto';
+import child_process from 'child_process';
+import fs from 'fs';
+import fs_Extra from 'fs-extra';
+import kill from 'tree-kill';
+import {fileURLToPath} from 'url';
+
+console.log(socketio);
+
+const app = express();
+const server = http.createServer(app);
+const PORT = process.env.PORT || 5000;
+const io = new socketio.Server(server);
+
+
+const __filename = fileURLToPath(import.meta.url);
+
+// 👇️ "/home/john/Desktop/javascript"
+const __dirname = path.dirname(__filename);
 
 const frame_rate = 144;
 const premium_frame_rate = 60;

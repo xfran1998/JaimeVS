@@ -1,7 +1,116 @@
 // TODO: Add time out to prevent spamming, maybe use a debounce function, add debounce in iframe update only
 // TODO: Add a way to save code
 
-require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.0/min/vs" }});
+// require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.0/min/vs" }});
+const sourceUser = {
+  id: "source",
+  label: "Source User",
+  color: "orange"
+};
+
+const staticUser = {
+  id: "static",
+  label: "Static User",
+  color: "blue"
+};
+
+const $ = selector => document.querySelector(selector);
+const $$ = selector => document.querySelectorAll(selector);
+
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
+import * as MonacoCollabExt from "@convergencelabs/monaco-collab-ext";
+// import css from "/src/example.css";
+
+  //
+  // Create the target editor where events will be played into.
+  //
+	console.log(monaco.editor);
+  const target = monaco.editor.create(document.getElementById("target-editor"), {
+    value: 'test',
+    theme: "vs-dark'",
+    language: 'javascript',
+    readOnly: false
+  });
+
+  const remoteCursorManager = new MonacoCollabExt.RemoteCursorManager({
+    editor: target,
+    tooltips: true,
+    tooltipDuration: 2
+  });
+  
+  const sourceUserCursor = remoteCursorManager.addCursor(sourceUser.id, sourceUser.color, sourceUser.label);
+
+  const remoteSelectionManager = new MonacoCollabExt.RemoteSelectionManager({editor: target});
+  remoteSelectionManager.addSelection(sourceUser.id, sourceUser.color, sourceUser.label);
+
+
+  const targetContentManager = new MonacoCollabExt.EditorContentManager({
+    editor: target
+  });
+
+
+  //
+  // Create the source editor were events will be generated.
+  //
+  const source = monaco.editor.create(document.getElementById("source-editor"), {
+    value: 'test',
+    theme: "vs-dark'",
+    language: 'javascript'
+  });
+
+
+  source.onDidChangeCursorPosition(e => {
+    const offset = source.getModel().getOffsetAt(e.position);
+    sourceUserCursor.setOffset(offset);
+  });
+
+  source.onDidChangeCursorSelection(e => {
+    const startOffset = source.getModel().getOffsetAt(e.selection.getStartPosition());
+    const endOffset = source.getModel().getOffsetAt(e.selection.getEndPosition());
+    remoteSelectionManager.setSelectionOffsets(sourceUser.id, startOffset, endOffset);
+  });
+
+  const sourceContentManager = new MonacoCollabExt.EditorContentManager({
+    editor: source,
+    onInsert(index, text) {
+      // target.updateOptions({readOnly: false});
+      targetContentManager.insert(index, text);
+      // target.updateOptions({readOnly: true});
+    },
+    onReplace(index, length, text) {
+      // target.updateOptions({readOnly: false});
+      targetContentManager.replace(index, length, text);
+      // target.updateOptions({readOnly: true});
+    },
+    onDelete(index, length) {
+      // target.updateOptions({readOnly: false});
+      targetContentManager.delete(index, length);
+      // target.updateOptions({readOnly: true});
+    }
+  });
+
+  
+  const originCursorManager = new MonacoCollabExt.RemoteCursorManager({
+    editor: source,
+    tooltips: true,
+    tooltipDuration: 2
+  });
+
+  const staticUserCursor = originCursorManager.addCursor(staticUser.id, staticUser.color, staticUser.label);
+
+  const sourceSelectionManager = new MonacoCollabExt.RemoteSelectionManager({editor: source});
+  sourceSelectionManager.addSelection(staticUser.id, staticUser.color, staticUser.label);
+
+   //
+  // Faked other user.
+  //
+  staticUserCursor.setOffset(50);
+  sourceSelectionManager.setSelectionOffsets(staticUser.id, 40, 50);
+
+  window.addEventListener('resize', () => {
+    source.layout();
+    target.layout();
+  });
 
 var UPDATE_RATE = 0; // each 5000 will update if the code has not been changed in more than 5000 ms
 var iframe = $("#iframe-res");
