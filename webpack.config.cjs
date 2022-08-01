@@ -29,9 +29,5 @@ module.exports = {
 			template: './src/index.html',
 			filename: './index.html'
 		})
-	],
-  resolve: {
-    modules: [path.resolve(__dirname, './app/'), path.resolve('./node_modules')],
-		mainFields: ['browser', 'main', 'module']
-  }
+	]
 };
