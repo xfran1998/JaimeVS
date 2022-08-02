@@ -2,6 +2,8 @@
 // TODO: Add a way to save code
 
 // require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.0/min/vs" }});
+let main_program;
+
 const sourceUser = {
   id: "source",
   label: "Source User",
@@ -20,7 +22,7 @@ const $$ = selector => document.querySelectorAll(selector);
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import * as MonacoCollabExt from "@convergencelabs/monaco-collab-ext";
 import socket from './init.js';
-import {option_program} from './init.js';
+// import {option_program} from './init.js';
 const editors = {};
 
 function createEditor(editor, id_div, value, lenguage, user){
@@ -63,17 +65,23 @@ function addSelectorEditor(editor){
 	return remoteSelectionManager.addSelection(sourceUser.id, sourceUser.color, sourceUser.label);
 }
 
-  
+const demo_editor = {};
+
+
+
 function createOriginEditor(container){
 	  //
   // Create the source editor were events will be generated.
   //
-  const source = monaco.editor.create(document.getElementById(container), {
-    value: 'editorContents',
+	demo_editor[container] =  {};
+  demo_editor[container].editor = monaco.editor.create(document.getElementById(container), {
+    value: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
     theme: "vs-dark'",
     language: 'javascript'
   });
 
+	const source = demo_editor[container].editor;
+	
   source.onDidChangeCursorPosition(e => {
     const offset = source.getModel().getOffsetAt(e.position);
     // sourceUserCursor.setOffset(offset);
@@ -87,20 +95,42 @@ function createOriginEditor(container){
 		console.log('onDidChangeCursorSelection: ' + startOffset + ' ' + endOffset);
   });
 
-  const sourceContentManager = new MonacoCollabExt.EditorContentManager({
+  demo_editor[container].contentManager = new MonacoCollabExt.EditorContentManager({
     editor: source,
     onInsert(index, text) {
       //targetContentManager.insert(index, text);
-			console.log('insert');
+			// if (container == 'html'){
+			// 	demo_editor['css'].contentManager.insert(index, text);
+			// 	console.log('insert');
+			// }
+			socket.emit('client_code', { id: container, action: 'insert', values: [index, text] });
     },
     onReplace(index, length, text) {
-      // targetContentManager.replace(index, length, text);
-			console.log('replace');
+			// targetContentManager.replace(index, length, text);
+			// if (container == 'html'){
+			// 	demo_editor['css'].contentManager.replace(index, length, text);
+			// 	console.log('replace');
+			// }
+			socket.emit('client_code', { id: container, action: 'replace', values: [index, length, text] });
     },
     onDelete(index, length) {
-      // targetContentManager.delete(index, length);
-			console.log('delete');
+			// targetContentManager.delete(index, length);
+			// if (container == 'html'){
+			// 	demo_editor['css'].contentManager.delete(index, length);
+			// 	console.log('delete');
+			// }
+			socket.emit('client_code', { id: container, action: 'delete', values: [index, length] });
     }
+  });
+
+
+}
+
+function demo_cursor(){
+	const remoteCursorManager = new MonacoCollabExt.RemoteCursorManager({
+    editor: target,
+    tooltips: true,
+    tooltipDuration: 2
   });
 }
 
@@ -149,8 +179,8 @@ function createCodeEditor() {
 }
 
 function setListenersForCodeEditor() {
-	console.log('option_program: ' + option_program);
-	if (option_program == 'web'){
+	console.log('main_program: ' + main_program);
+	if (main_program == 'web'){
 		// addEventListener keyup will trigger when client press a key on editor 1
 		$("#html").addEventListener("keyup", function (e) {
 			getCodeFromEditor("html");
@@ -174,8 +204,8 @@ function setListenersForCodeEditor() {
 		return;
 	}
 	
-	if (option_program == 'processing'){
-		// console.log("setListenersForCodeEditor2:" + option_program);
+	if (main_program == 'processing'){
+		// console.log("setListenersForCodeEditor2:" + main_program);
 		// addEventListener keyup will trigger when client press a key on editor 1
 		$("#processing-editor").addEventListener("keyup", function (e) {
 			getCodeFromEditor("processing");
@@ -203,7 +233,7 @@ function updateIframe(){
 }
 
 function createCodeEditorContainers(){
-	if (option_program == 'web'){
+	if (main_program == 'web'){
 		// Instance 1
 		require(["vs/editor/editor.main"], function () {
 			editor.html = monaco.editor.create(document.getElementById("html"), {
@@ -354,8 +384,8 @@ function createCodeEditorContainers(){
 		return;
 	}
 	
-	if (option_program == 'processing'){
-		// console.log("createCodeEditorContainers2:" + option_program);
+	if (main_program == 'processing'){
+		// console.log("createCodeEditorContainers2:" + main_program);
 		require(["vs/editor/editor.main"], function () {
 			editor.processing = monaco.editor.create(document.getElementById("processing-editor"), {
 				value: "",
@@ -404,19 +434,33 @@ function initIframe() {
 	socket.emit("get_code_client");
 }
 
-socket.on('server_code', data => {
+socket.on('server_code', data => { // update code from server
 	// console.log('server_code: ');
 	// console.log(data);
+	console.table(data);
 	
 	/*if (editor[data.id] == null) return;
 	
 	setCodeFromEditor(data.id, data.code); // change editor
 
-	if (option_program == 'web')
+	if (main_program == 'web')
 		updateIframe();*/
+
+	if (data.action == 'insert') {
+		console.log('insert', data.id);
+		demo_editor[data.id].contentManager.insert(...data.values);
+	}
+	else if (data.action == 'replace') {
+		console.log('replace', data.id);
+		demo_editor[data.id].contentManager.replace(...data.values);
+	}
+	else if (data.action == 'delete') {
+		console.log('delete', data.id);
+		demo_editor[data.id].contentManager.delete(...data.values);
+	}
 });
 
-socket.on('get_code_server', data => {
+socket.on('get_code_server', data => { // init
 	// console.log('get_code_server: ');
 	// console.log(data);
 	// console.log('**************')
@@ -429,23 +473,24 @@ socket.on('get_code_server', data => {
 
 	// console.log('**************')
 	
-	if (option_program == 'web')
+	if (main_program == 'web')
 		updateIframe();*/
 });
 
 
 socket.on('enter_room', (response) => {
-	console.log('option_program: ' + option_program);
+	main_program = response.program;
+	console.log('main_program: ' + response.program);
   // console.log('enter room', response);
 	
-  /*if (option_program == 'web') {
+  /*if (main_program == 'web') {
 		$('#init-container').classList.add('hidden');
     $('#editor-container').classList.remove('hidden');
     setTimeout(initIframe, 1000);
 		UPDATE_RATE = 3000; // Update rate for JS iframe
 		createCodeEditor();
   }
-  else if (option_program == 'processing') {
+  else if (main_program == 'processing') {
 		$('#init-container').classList.add('hidden');
     $('#processing-container').classList.remove('hidden');
     setTimeout(initIframe, 1000);
@@ -453,17 +498,18 @@ socket.on('enter_room', (response) => {
   }
   else
 	alert('Unexpected error, reload the page and try again');*/
-	if (option_program == 'web') {
+	if (main_program == 'web') {
+		
 			$('#init-container').classList.add('hidden');
 			$('#editor-container').classList.remove('hidden');
 			setTimeout(initIframe, 1000);
-			createOriginEditor('html');
-			createOriginEditor('css');
 			createOriginEditor('js');
+			createOriginEditor('css');
+			createOriginEditor('html');
 			UPDATE_RATE = 3000; // Update rate for JS iframe
 			// createCodeEditor();
 		}
-		else if (option_program == 'processing') {
+		else if (main_program == 'processing') {
 			$('#init-container').classList.add('hidden');
 			$('#processing-container').classList.remove('hidden');
 			setTimeout(initIframe, 1000);

@@ -39,9 +39,14 @@ const __dirname = path.dirname(__filename);
 const frame_rate = 144;
 const premium_frame_rate = 60;
 
+// const init_iframe_code = {
+//     html: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
+//     css: ["h1 {", '\tcolor: red;', "}"].join("\n"),
+//     js:  ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n")
+// };
 const init_iframe_code = {
-    html: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
-    css: ["h1 {", '\tcolor: red;', "}"].join("\n"),
+    html: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
+    css: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
     js:  ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n")
 };
 const init_processing_code = {
@@ -78,6 +83,22 @@ console.log("Empezando!!");
 const iframe_code_rooms = {};
 const socket_rooms = {};
 const socket_users = {};
+
+
+function insertCode(index, code, iframe_code) {
+    // insert into iframe_code the code at index
+    return iframe_code.slice(0, index) + code + iframe_code.slice(index);   
+}
+
+function deleteCode(index, lenght, iframe_code) {
+    // delete from iframe_code the code at index
+    return iframe_code.slice(0, index) + iframe_code.slice(index + lenght);
+}
+
+function replaceCode(index, length, text, iframe_code) {
+    // replace in iframe_code the code at index
+    return iframe_code.slice(0, index) + text + iframe_code.slice(index + length);
+}
 
 // Funcion que se ejecuta cuando un usuario se conecta al websocket
 io.on('connection', (socket) => {
@@ -127,12 +148,23 @@ io.on('connection', (socket) => {
             });
             return; // check if user exists
         }
-        socket.broadcast.to(socket_users[socket.id].room).emit('server_code', data);
-        
+
         if (data.id !== 'html' && data.id !== 'css' && data.id !== 'js' && data.id !== 'processing') return; // check if id is valid
-        
-        iframe_code_rooms[socket_users[socket.id].room][data.id] = data.code; // update iframe code of the room
-        
+        if (data.action != 'insert' && data.action != 'delete' && data.action != 'replace') return; // check if action is valid
+
+        if (data.action == 'insert') {
+            iframe_code_rooms[socket_users[socket.id].room][data.id] = insertCode(...data.values, iframe_code_rooms[socket_users[socket.id].room][data.id]);
+        }
+        else if (data.action == 'delete') {
+            iframe_code_rooms[socket_users[socket.id].room][data.id] = deleteCode(...data.values, iframe_code_rooms[socket_users[socket.id].room][data.id]);
+        }
+        else if (data.action == 'replace') {
+            iframe_code_rooms[socket_users[socket.id].room][data.id] = replaceCode(...data.values, iframe_code_rooms[socket_users[socket.id].room][data.id]);
+        }
+
+        console.table(data);
+        console.log(iframe_code_rooms[socket_users[socket.id].room]);
+        socket.broadcast.to(socket_users[socket.id].room).emit('server_code', data);
     });
     
 
