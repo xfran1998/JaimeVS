@@ -146,7 +146,7 @@ io.on('connection', (socket) => {
                 code: 408,
                 info: 'User not found'
             });
-            return; // check if user exists
+            return; 
         }
 
         if (data.id !== 'html' && data.id !== 'css' && data.id !== 'js' && data.id !== 'processing') return; // check if id is valid
@@ -167,6 +167,34 @@ io.on('connection', (socket) => {
         socket.broadcast.to(socket_users[socket.id].room).emit('server_code', data);
     });
     
+
+    // msg to set up client code at the beginning
+    socket.on('client_change_cursor_position', (data) => {
+        if (socket_users[socket.id] == null) { // check if user exists
+            socket.emit('error', {
+                code: 408,
+                info: 'User not found'
+            });
+            return; 
+        }
+
+        // socket.emit('server_change_cursor_position', data);
+        socket.broadcast.to(socket_users[socket.id].room).emit('server_change_cursor_position', data);
+    });
+
+    // msg to set up client code at the beginning
+    socket.on('client_change_cursor_selection', (data) => {
+        if (socket_users[socket.id] == null) { // check if user exists
+            socket.emit('error', {
+                code: 408,
+                info: 'User not found'
+            });
+            return; 
+        }
+
+        // socket.emit('server_change_cursor_selection', data);
+        socket.broadcast.to(socket_users[socket.id].room).emit('server_change_cursor_selection', data);
+    });
 
     // msg to set up client code at the beginning
     socket.on('get_code_client', (data) => {

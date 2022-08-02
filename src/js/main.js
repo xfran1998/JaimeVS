@@ -22,16 +22,17 @@ const $$ = selector => document.querySelectorAll(selector);
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import * as MonacoCollabExt from "@convergencelabs/monaco-collab-ext";
 import socket from './init.js';
+import { userAgent } from 'monaco-editor/esm/vs/base/common/platform.js';
 // import {option_program} from './init.js';
 const editors = {};
 
 function createEditor(editor, id_div, value, lenguage, user){
 	//
-  // Create the target editor where events will be played into.
-  //
+  	// Create the target editor where events will be played into.
+  	//
 	console.log(monaco.editor);
 	editor[editor] = {};
-  editor[editor].editor = createCodeEditor(id_div, value, lenguage);
+  	editor[editor].editor = createCodeEditor(id_div, value, lenguage);
 	editor[editor].cursorManager = createCursorManagerEditor(editor[editor].editor);
 	editor[editor].cursor = createCursor(editor[editor].cursorManager, user);
 }
@@ -45,7 +46,7 @@ function createCodeEditor(id_div, value, lenguage){
   });
 }
 
-function createCursorManagerEditor(editor) {
+function createCursorManagerEditor(target) {
 	return new MonacoCollabExt.RemoteCursorManager({
     editor: target,
     tooltips: true,
@@ -61,69 +62,83 @@ function createSelectorManagerEditor(editor){
 	return new MonacoCollabExt.RemoteSelectionManager({editor: editor});
 }
 
-function addSelectorEditor(editor){
-	return remoteSelectionManager.addSelection(sourceUser.id, sourceUser.color, sourceUser.label);
+function addSelectorEditor(remoteSelectionManager, user){
+	return remoteSelectionManager.addSelection(user.id, user.color, user.label);
 }
 
-const demo_editor = {};
-
-
+const demo_editors = {};
+const demo_cursors = {};
 
 function createOriginEditor(container){
-	  //
-  // Create the source editor were events will be generated.
-  //
-	demo_editor[container] =  {};
-  demo_editor[container].editor = monaco.editor.create(document.getElementById(container), {
-    value: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
-    theme: "vs-dark'",
-    language: 'javascript'
-  });
+	//
+  	// Create the source editor were events will be generated.
+  	//
+	demo_editors[container] =  {};
+  	demo_editors[container].editor = monaco.editor.create(document.getElementById(container), {
+		value: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
+		theme: "vs-dark'",
+		language: 'javascript'
+	});
 
-	const source = demo_editor[container].editor;
+	const source = demo_editors[container].editor;
 	
-  source.onDidChangeCursorPosition(e => {
-    const offset = source.getModel().getOffsetAt(e.position);
-    // sourceUserCursor.setOffset(offset);
-		console.log('onDidChangeCursorPosition: ' + offset);
-  });
+	source.onDidChangeCursorPosition(e => {
+		const offset = source.getModel().getOffsetAt(e.position);
+		// sourceUserCursor.setOffset(offset);
+		// console.log('onDidChangeCursorPosition: ' + offset);
+		socket.emit('client_change_cursor_position', [container, offset]);
+	});
 
-  source.onDidChangeCursorSelection(e => {
-    const startOffset = source.getModel().getOffsetAt(e.selection.getStartPosition());
-    const endOffset = source.getModel().getOffsetAt(e.selection.getEndPosition());
-    //remoteSelectionManager.setSelectionOffsets(sourceUser.id, startOffset, endOffset);
-		console.log('onDidChangeCursorSelection: ' + startOffset + ' ' + endOffset);
-  });
+	source.onDidChangeCursorSelection(e => {
+		const startOffset = source.getModel().getOffsetAt(e.selection.getStartPosition());
+		const endOffset = source.getModel().getOffsetAt(e.selection.getEndPosition());
+		//remoteSelectionManager.setSelectionOffsets(sourceUser.id, startOffset, endOffset);
+		// console.log('onDidChangeCursorSelection: ' + startOffset + ' ' + endOffset);
+		socket.emit('client_change_cursor_selection', [container, startOffset, endOffset]);
+	});
 
-  demo_editor[container].contentManager = new MonacoCollabExt.EditorContentManager({
-    editor: source,
-    onInsert(index, text) {
-      //targetContentManager.insert(index, text);
+	demo_editors[container].contentManager = new MonacoCollabExt.EditorContentManager({
+		editor: source,
+		onInsert(index, text) {
+			//targetContentManager.insert(index, text);
 			// if (container == 'html'){
-			// 	demo_editor['css'].contentManager.insert(index, text);
+			// 	demo_editors['css'].contentManager.insert(index, text);
 			// 	console.log('insert');
 			// }
 			socket.emit('client_code', { id: container, action: 'insert', values: [index, text] });
-    },
-    onReplace(index, length, text) {
+		},
+		onReplace(index, length, text) {
 			// targetContentManager.replace(index, length, text);
 			// if (container == 'html'){
-			// 	demo_editor['css'].contentManager.replace(index, length, text);
+			// 	demo_editors['css'].contentManager.replace(index, length, text);
 			// 	console.log('replace');
 			// }
 			socket.emit('client_code', { id: container, action: 'replace', values: [index, length, text] });
-    },
-    onDelete(index, length) {
+		},
+		onDelete(index, length) {
 			// targetContentManager.delete(index, length);
 			// if (container == 'html'){
-			// 	demo_editor['css'].contentManager.delete(index, length);
+			// 	demo_editors['css'].contentManager.delete(index, length);
 			// 	console.log('delete');
 			// }
 			socket.emit('client_code', { id: container, action: 'delete', values: [index, length] });
-    }
-  });
+		}
+	});
 
 
+	// *** CURSOR ***
+	// Create cursor manager
+	demo_editors[container].cursorManager = createCursorManagerEditor(source);
+
+	// Create cursor
+	demo_cursors[container] = addCursor(demo_editors[container].cursorManager, sourceUser);
+
+	// *** SELECTOR ***
+	// Create selector manager
+	demo_editors[container].selectorManager = createSelectorManagerEditor(source);
+
+	// Create selector
+	addSelectorEditor(demo_editors[container].selectorManager, sourceUser);
 }
 
 function demo_cursor(){
@@ -448,15 +463,15 @@ socket.on('server_code', data => { // update code from server
 
 	if (data.action == 'insert') {
 		console.log('insert', data.id);
-		demo_editor[data.id].contentManager.insert(...data.values);
+		demo_editors[data.id].contentManager.insert(...data.values);
 	}
 	else if (data.action == 'replace') {
 		console.log('replace', data.id);
-		demo_editor[data.id].contentManager.replace(...data.values);
+		demo_editors[data.id].contentManager.replace(...data.values);
 	}
 	else if (data.action == 'delete') {
 		console.log('delete', data.id);
-		demo_editor[data.id].contentManager.delete(...data.values);
+		demo_editors[data.id].contentManager.delete(...data.values);
 	}
 });
 
@@ -517,6 +532,18 @@ socket.on('enter_room', (response) => {
 		}
 		else
 			alert('Unexpected error, reload the page and try again');
+});
+
+socket.on('server_change_cursor_position', (data) => {
+	const [ id, offset ] = data;
+	demo_cursors[id].setOffset(offset);
+});
+
+socket.on('server_change_cursor_selection', (data) => {
+	const [ id, ...info ] = data;
+	console.log('id: ' + id);
+	console.log('info: ', ...info);
+	demo_editors[id].selectorManager.setSelectionOffsets(sourceUser.id, ...info);
 });
 
 
