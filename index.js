@@ -1,17 +1,3 @@
-/*const path = require('path');
-const express = require('express');
-const http = require('http');
-const socketio = require('socket.io');
-// const { randomInt } = require('crypto');
-const child_process = require('child_process');
-const fs = require('fs');
-const fs_Extra = require('fs-extra');
-const kill = require('tree-kill');
-
-const app = express();
-const server = http.createServer(app);
-const PORT = process.env.PORT || 5000;
-const io = socketio(server);*/
 import path from 'path';
 import express from 'express';
 import http from 'http';
@@ -27,7 +13,7 @@ console.log(socketio);
 
 const app = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const io = new socketio.Server(server);
 
 
