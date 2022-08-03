@@ -2,3 +2,5 @@ Processing/java/lib/modules
 node_modules/
 .vscode/
 dist/
+tmp/
+.well-known/
