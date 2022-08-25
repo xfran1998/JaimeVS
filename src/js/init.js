@@ -4,8 +4,8 @@ console.log(socket);
 console.log('hello');
 
 // const socket = io();
-const $ = selector => document.querySelector(selector);
-const $$ = selector => document.querySelectorAll(selector);
+const $ = (s, e = document) => e.querySelector(s);
+const $$ = (s, e = document) => e.querySelectorAll(s);
 
 var option_program = null;
 

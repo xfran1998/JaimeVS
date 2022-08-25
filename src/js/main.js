@@ -40,7 +40,7 @@ function createEditor(editor, id_div, value, lenguage, user){
 function createCodeEditor(id_div, value, lenguage){
 	return monaco.editor.create(document.getElementById(id_div), {
     value: value,
-    theme: "vs-dark'",
+    theme: "vs-dark",
     language: lenguage,
     readOnly: false
   });
@@ -69,15 +69,15 @@ function addSelectorEditor(remoteSelectionManager, user){
 const demo_editors = {};
 const demo_cursors = {};
 
-function createOriginEditor(container){
+function createOriginEditor(container, content, lang){
 	//
   	// Create the source editor were events will be generated.
-  	//
 	demo_editors[container] =  {};
   	demo_editors[container].editor = monaco.editor.create(document.getElementById(container), {
-		value: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
-		theme: "vs-dark'",
-		language: 'javascript'
+		// value: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
+		value: content,
+		theme: "vs-dark",
+		language: lang,
 	});
 
 	const source = demo_editors[container].editor;
@@ -106,6 +106,7 @@ function createOriginEditor(container){
 			// 	console.log('insert');
 			// }
 			socket.emit('client_code', { id: container, action: 'insert', values: [index, text] });
+			updateIframe();
 		},
 		onReplace(index, length, text) {
 			// targetContentManager.replace(index, length, text);
@@ -114,6 +115,7 @@ function createOriginEditor(container){
 			// 	console.log('replace');
 			// }
 			socket.emit('client_code', { id: container, action: 'replace', values: [index, length, text] });
+			updateIframe();
 		},
 		onDelete(index, length) {
 			// targetContentManager.delete(index, length);
@@ -122,6 +124,7 @@ function createOriginEditor(container){
 			// 	console.log('delete');
 			// }
 			socket.emit('client_code', { id: container, action: 'delete', values: [index, length] });
+			updateIframe();
 		}
 	});
 
@@ -445,6 +448,76 @@ function createCodeEditorContainers(){
 
 */
 
+
+function updateIframe(){
+	// console.log(demo_editors['html'].editor.getValue());
+	/*$('iframe').srcdoc = demo_editors['html'].editor.getValue() + 
+	'<style>' + demo_editors['css'].editor.getValue() + '</style>' + 
+	`<script> 
+	let debounceTimer;
+	function debounce (callback, time) {
+		window.clearTimeout(debounceTimer);
+		debounceTimer = window.setTimeout(callback, time);
+	};
+	debounce(() => {
+		console.log("*** updateIframeJS ***");
+		${demo_editors['js'].editor.getValue()}
+	}, ${UPDATE_RATE});</script>`;*/
+	$('iframe').srcdoc = '<body>' + demo_editors['html'].editor.getValue() + '</body>' + 
+	'<style>' + demo_editors['css'].editor.getValue() + `\nbody{
+		animation: bounce-top 0.9s both;
+	}
+	
+	@keyframes bounce-top {
+	  0% {
+		transform: translateY(-45px);
+		animation-timing-function: ease-in;
+		opacity: 1;
+	  }
+	  24% {
+		opacity: 1;
+	  }
+	  40%{
+		transform: translateY(-24px);
+		animation-timing-function: ease-in;
+	  }
+	  65% {
+		transform: translateY(-12px);
+		animation-timing-function: ease-in;
+	  }
+	  82% {
+		transform: translateY(-6px);
+		animation-timing-function: ease-in;
+	  }
+	  93% {
+		transform: translateY(-4px);
+		animation-timing-function: ease-in;
+	  }
+	  25%,
+	  55%,
+	  75%,
+	  87% {
+		transform: translateY(0px);
+		animation-timing-function: ease-out;
+	  }
+	  100% {
+		transform: translateY(0px);
+		animation-timing-function: ease-out;
+		opacity: 1;
+	  }
+	}</style>` + 
+	`<script> 
+	let debounceTimer;
+	function debounce (callback, time) {
+		window.clearTimeout(debounceTimer);
+		debounceTimer = window.setTimeout(callback, time);
+	};
+	debounce(() => {
+		console.log("*** updateIframeJS ***");
+		${demo_editors['js'].editor.getValue()}
+	}, ${UPDATE_RATE});</script>`;
+}
+
 function initIframe() {
 	socket.emit("get_code_client");
 }
@@ -473,23 +546,28 @@ socket.on('server_code', data => { // update code from server
 		console.log('delete', data.id);
 		demo_editors[data.id].contentManager.delete(...data.values);
 	}
+
+	updateIframe();
 });
 
 socket.on('get_code_server', data => { // init
-	// console.log('get_code_server: ');
-	// console.log(data);
-	// console.log('**************')
+	console.log('get_code_server: ');
+	console.log(data);
+	console.log('**************')
 	
 	// iterate through editor objects
-	/*for (var key in data) {
+	for (var key in data) {
 		// console.log('key: ' + key);
-		setCodeFromEditor(key, data[key]); // change editor
+		// setCodeFromEditor(key, data[key]); // change editor
+		const lenguage = key == 'js' ? 'javascript' : key;
+		console.log('lenguage: ' + lenguage);
+		createOriginEditor(key, data[key], lenguage); // create editor
 	}
 
 	// console.log('**************')
 	
 	if (main_program == 'web')
-		updateIframe();*/
+		updateIframe();
 });
 
 
@@ -517,17 +595,14 @@ socket.on('enter_room', (response) => {
 		
 			$('#init-container').classList.add('hidden');
 			$('#editor-container').classList.remove('hidden');
-			setTimeout(initIframe, 1000);
-			createOriginEditor('js');
-			createOriginEditor('css');
-			createOriginEditor('html');
+			setTimeout(initIframe, 100);
 			UPDATE_RATE = 3000; // Update rate for JS iframe
 			// createCodeEditor();
 		}
 		else if (main_program == 'processing') {
 			$('#init-container').classList.add('hidden');
 			$('#processing-container').classList.remove('hidden');
-			setTimeout(initIframe, 1000);
+			setTimeout(initIframe, 100);
 			// createCodeEditor();
 		}
 		else

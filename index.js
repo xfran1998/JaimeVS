@@ -25,14 +25,9 @@ const __dirname = path.dirname(__filename);
 const frame_rate = 144;
 const premium_frame_rate = 60;
 
-// const init_iframe_code = {
-//     html: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
-//     css: ["h1 {", '\tcolor: red;', "}"].join("\n"),
-//     js:  ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n")
-// };
 const init_iframe_code = {
-    html: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
-    css: ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n"),
+    html: ["<h1>", '\tHola Jaime', "</h1>"].join("\n"),
+    css: ["h1 {", '\tcolor: red;', "}"].join("\n"),
     js:  ["function x() {", '\tconsole.log("Hola Jaime!");', "}", "x();"].join("\n")
 };
 const init_processing_code = {
@@ -262,7 +257,7 @@ io.on('connection', (socket) => {
         iframe_code_rooms[data.room] = {};
         if (data.program == 'web') {
             // create initial code
-            Object.assign(iframe_code_rooms[data.room], init_iframe_code);
+            iframe_code_rooms[data.room] = { ...init_iframe_code };
             console.log('Setting up web code');
             console.log(init_iframe_code);
         }
@@ -270,7 +265,7 @@ io.on('connection', (socket) => {
         else if (data.program == 'processing') {
             // create initial code
             // create a copy of init_processing_code
-            Object.assign(iframe_code_rooms[data.room], init_processing_code);
+            iframe_code_rooms[data.room] = init_processing_code;
             
             // *** this is moved to client side ***
             // console.log('Setting up processing code');
