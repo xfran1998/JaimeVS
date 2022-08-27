@@ -451,7 +451,7 @@ function createCodeEditorContainers(){
 
 function updateIframe(){
 	// console.log(demo_editors['html'].editor.getValue());
-	/*$('iframe').srcdoc = demo_editors['html'].editor.getValue() + 
+	$('iframe').srcdoc = demo_editors['html'].editor.getValue() + 
 	'<style>' + demo_editors['css'].editor.getValue() + '</style>' + 
 	`<script> 
 	let debounceTimer;
@@ -462,8 +462,8 @@ function updateIframe(){
 	debounce(() => {
 		console.log("*** updateIframeJS ***");
 		${demo_editors['js'].editor.getValue()}
-	}, ${UPDATE_RATE});</script>`;*/
-	$('iframe').srcdoc = '<body>' + demo_editors['html'].editor.getValue() + '</body>' + 
+	}, ${UPDATE_RATE});</script>`;
+	/*$('iframe').srcdoc = '<body>' + demo_editors['html'].editor.getValue() + '</body>' + 
 	'<style>' + demo_editors['css'].editor.getValue() + `\nbody{
 		animation: bounce-top 0.9s both;
 	}
@@ -515,7 +515,7 @@ function updateIframe(){
 	debounce(() => {
 		console.log("*** updateIframeJS ***");
 		${demo_editors['js'].editor.getValue()}
-	}, ${UPDATE_RATE});</script>`;
+	}, ${UPDATE_RATE});</script>`;*/
 }
 
 function initIframe() {
@@ -621,17 +621,6 @@ socket.on('server_change_cursor_selection', (data) => {
 	demo_editors[id].selectorManager.setSelectionOffsets(sourceUser.id, ...info);
 });
 
-
-// Processing
-$('#run-btn').addEventListener('click', () => {
-	console.log('run-btn');
-	startProgram();
-});
-
-$('#stop-btn').addEventListener('click', () => {
-	console.log('stop-btn');
-	stopProgram();
-});
 
 function startProgram(){
 	// run the processing program inside the editor

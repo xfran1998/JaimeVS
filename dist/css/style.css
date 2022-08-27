@@ -89,8 +89,6 @@ body{
     padding-left: 20px;
 }
 
-
-
 #program-option-container img{
     height: 100%;
     border-radius: 5px;
@@ -105,14 +103,15 @@ iframe {
 }
 
 .code-container {
-    width: 33%;
+    width: 33.33%;
     min-height: 250px;
+    height: 100%;
     overflow: hidden;
-    margin: auto;
-    display: inline-block;
-    background: #f4f4f9;
-    outline: none;
-    height: 35vh;
+    /* margin: auto; */
+    /* display: inline-block; */
+    /* background: #f4f4f9; */
+    /* outline: none; */
+    /* height: 35vh; */
 }
 
 .code-container > div , .processing-code-container > div{
@@ -171,8 +170,19 @@ iframe {
     background-color: #fffffe;
 }
 
-#processing-editor .monaco-editor{
+#editor-wrapper1{
+    width: 100%;
+    height: 35vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    resize: vertical;
+}
+
+.monaco-editor{
     padding-top: 10px;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 #processing-output{
@@ -352,4 +362,32 @@ position: absolute;
 pointer-events: auto;
 opacity: 0.3;
 background: blue;
+}
+
+#extra-content{
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    display: inline-block;
+}
+
+#box{
+    display: inline-block;
+    position:relative;
+    height:50%;
+    width:50%;
+    background:#000;
+    border-radius:10px;
+}
+
+#handle{
+    position:absolute;
+    height:100px;
+    width:100px;
+    border:1px solid rgb(255, 0, 0);
+    background:#fff;
+    border-radius:50%;
+    right:-25px;
+    bottom:-25px;
+    z-index: 2;
 }

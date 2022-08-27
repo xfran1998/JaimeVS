@@ -87,16 +87,5 @@ $('#web-dev-btn').addEventListener('click', function (e) {
   $('.create-name-room-container').classList.remove('hidden');
 });
 
-// program option button
-$('#processing-btn').addEventListener('click', function (e) {
-  option_program = 'processing';
-
-  // hide all option buttons container
-  $('#program-option-container').classList.add('hidden');
-  
-  // show create name room container
-  $('.create-name-room-container').classList.remove('hidden');
-});
-
 export default socket;
 export {option_program};

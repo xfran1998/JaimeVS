@@ -9,6 +9,10 @@
         <title>browser-amd-editor</title>
     </head>
     <body>
+        <!-- <div id="extra-content"></div>
+        <div id="box">
+            <div id="handle"></div>
+        </div> -->
         <div id="init-container">
             <div id="init-logo">
                 <img src="img/logo_final.png" alt="browser-amd-editor" />
@@ -19,7 +23,7 @@
                 <div class="hidden enter-room" id="create-room-container">
                     <div id="program-option-container">
                         <button id="web-dev-btn"><img src="img/world-wide-web.png" alt="web"><p>Web Dev</p></button>
-                        <button id="processing-btn"><img src="img/Processing_Icon.png" alt="processing"><p>Processing</p></button>
+                        <p>More incoming...</p>
                     </div>
                     <div class="create-name-room-container hidden" id="web-dev">
                         <label for="create-room-name">Room Name</label>
@@ -42,31 +46,16 @@
 
         <!-- TODO: Change this later to their own html and get them with fetch -->
         <div class="hidden" id="editor-container">
-            <div class="code-container" id="html"></div>
-            <div class="code-container" id="css"></div>
-            <div class="code-container" id="js"></div>    
+            <div id="editor-wrapper1">
+                <div class="code-container" id="html"></div>
+                <div class="code-container" id="css"></div>
+                <div class="code-container" id="js"></div>    
+            </div>
             <iframe id="iframe-res"></iframe>
         </div>
 
         <!-- Processing -->
-        <div class="hidden" id="processing-container">
-            <div class="header">
-                <h1>Processing</h1>
-                <div class="buttons">
-                    <button id="run-btn"><i class="fa-solid fa-play"></i></button>
-                    <button id="stop-btn"><i class="fa-solid fa-stop"></i></button>
-                </div>                
-            </div>
-            <div class="body">
-                <div class="processing-code-container" id="processing-editor"></div>
-                <div class="processing-code-container">
-                    <div class="processing-code-container" id="processing-output"></div>
-                    <div class="processing-code-container" id="processing-img-wrapper"><div id="img-processing-svg"></div></div>
-                    <!-- <div class="processing-code-container" id="processing-img-wrapper"><svg id="img-processing-svg" xmlns="http://www.w3.org/2000/svg"></svg></div> -->
-                    <!-- <div class="processing-code-container" id="processing-img-wrapper"><canvas  id="img-processing"></canvas></div> -->
-                </div>
-            </div>
-        </div>
+        
 
         <!-- impot socket.io -->
         <!-- <script src="/socket.io/socket.io.js"></script> -->
@@ -90,5 +79,6 @@
         <script src="/socket.io/socket.io.js"></script>
         <!-- <script type="module" src="js/init.js"></script> -->
 		<script type="module" src="js/main.js"></script>
+        <script src="js/resize.js"></script>
     </body>
 </html>
