@@ -22,7 +22,6 @@ const $$ = selector => document.querySelectorAll(selector);
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import * as MonacoCollabExt from "@convergencelabs/monaco-collab-ext";
 import socket from './init.js';
-import { userAgent } from 'monaco-editor/esm/vs/base/common/platform.js';
 // import {option_program} from './init.js';
 const editors = {};
 

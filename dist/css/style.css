@@ -364,30 +364,24 @@ opacity: 0.3;
 background: blue;
 }
 
-#extra-content{
+.extra-content{
     width: 100px;
     height: 100px;
     background-color: red;
     display: inline-block;
 }
 
-#box{
+.box{
     display: inline-block;
     position:relative;
-    height:50%;
-    width:50%;
+    height:200px;
+    width:200px;
     background:#000;
-    border-radius:10px;
 }
 
-#handle{
+.handle{
     position:absolute;
-    height:100px;
-    width:100px;
-    border:1px solid rgb(255, 0, 0);
-    background:#fff;
-    border-radius:50%;
-    right:-25px;
-    bottom:-25px;
+    border: 1px solid rgb(255, 0, 0);
+    background:rgb(15, 148, 215);
     z-index: 2;
 }

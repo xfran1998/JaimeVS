@@ -453,6 +453,7 @@ function run_script(command, args, cwd, time_out=null, callback) {
 
 server.listen(PORT, () => {console.log(`runing on port ${PORT}`);});
 
+// processing code --> moved to electron client app
 function run_code(socket, room_name){
     var time_out = 10000; // 10 seconds
     console.log('running on: ', process.platform);
