@@ -15,3 +15,5 @@ Para entrar en la sala de tu amigo sólo hay que darle a join y introducir el mi
 Agradezco cualquier feedback de como mejorar la web y qué características serian interesantes :heart_eyes: .
 
 La web se puede usar sin problemas y esta abierta a quien la necesite en su versión alpha :Messirve: .
+
+LINK: https://sevng.com/
