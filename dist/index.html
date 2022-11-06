@@ -1,81 +1,34 @@
-<!-- TODO: Drawing  -->
-
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-		<link rel="stylesheet" href="css/style.css">
-        <script src="https://kit.fontawesome.com/b854f11bc3.js" crossorigin="anonymous"></script>
-        <title>browser-amd-editor</title>
-    </head>
-    <body>
-        <div id="test">
-
-        </div>
-        <div id="init-container">
-            <div id="init-logo">
-                <img src="img/logo_final.png" alt="browser-amd-editor" />
-            </div>
-            <div id="init-btns">
-                <button id="create-room">Create Room</button>
-                <button id="join-room">Join Room</button>
-                <div class="hidden enter-room" id="create-room-container">
-                    <div id="program-option-container">
-                        <button id="web-dev-btn"><img src="img/world-wide-web.png" alt="web"><p>Web Dev</p></button>
-                        <p>More incoming...</p>
-                    </div>
-                    <div class="create-name-room-container hidden" id="web-dev">
-                        <label for="create-room-name">Room Name</label>
-                        <input type="text" id="create-room-name" placeholder="Room Name" />
-                        <button id="create-room-btn">Create</button>
-                    </div>
-                    <div class="create-name-room-container hidden" id="processing">
-                        <label for="create-room-name">Room Name</label>
-                        <input type="text" id="create-room-name" placeholder="Room Name" />
-                        <button id="create-room-btn">Create</button>
-                    </div>
-                </div>
-                <div class="hidden enter-room" id="join-room-container">
-                    <label for="join-room-name">Room Name</label>
-                    <input type="text" id="join-room-name" placeholder="Room Name" />
-                    <button id="join-room-btn">Join</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TODO: Change this later to their own html and get them with fetch -->
-        <div class="hidden" id="editor-container">
-            <div id="editor-wrapper1">
-                <div class="code-container" id="html"></div>
-                <div class="code-container" id="css"></div>
-                <div class="code-container" id="js"></div>    
-            </div>
-            <iframe id="iframe-res"></iframe>
-        </div>
-
-        <!-- Processing -->
-        
-
-        <!-- impot socket.io -->
-        <!-- <script src="/socket.io/socket.io.js"></script> -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs
-            /monaco-editor/0.30.0/min/vs/loader.js"></script> -->
-            <!-- <div class="editors">
-                <div class="editor-column">
-                  <h2>Source Editor</h2>
-                  <div class="description">Type and make selections here.</div>
-                  <div class="editor" id="source-editor"></div>
-                </div>
-                <div class="editor-column">
-                  <h2>Target Editor</h2>
-                  <div class="description">See remote cursors and selections here.</div>
-                  <div class="editor" id="target-editor"></div>
-                </div>
-              </div> -->
-        <!-- socket.io -->
-        <script src="/socket.io/socket.io.js"></script>
-        <!-- <script type="module" src="js/init.js"></script> -->
-		<script type="module" src="js/main.js"></script>
-        <script src="js/resize.js"></script>
-    </body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/default_style.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Resiz</h1>
+    <div id="test"></div>
+    <script src="js/resiz.js"></script>
+    <script>
+      // Valid layour
+      let join = true;
+      const valid_box = new resizeBox(
+        [
+          ["nav", "nav", "nav"],
+          ["left-menu", "code", "code"],
+          ["left-menu", "iframe", "iframe"],
+          ["left-menu", "iframe", "iframe"],
+        ],
+        {
+          width: "600px",
+          height: "500px",
+          thickness: "4px",
+          color: "#111",
+          join,
+        }
+      );
+    </script>
+  </body>
 </html>
